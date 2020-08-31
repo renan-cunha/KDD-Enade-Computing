@@ -43,6 +43,39 @@ def add_correct_columns(df: pd.DataFrame) -> pd.DataFrame:
         df.loc[:, f"QUESTAO_OBJ_{i}_ACERTO"] = var
     return df
 
+def is_question_cancelled(id_question: str, df_enade: pd.DataFrame) -> bool:
+    """Returns True if the question is cancelled and False otherwise.
+    id_question is in the format:
+        
+        [D1, D5] for discursive questions
+        [1, 35] for objective questions"""
+
+    if "D" in id_question:
+        if int(id_question[-1]) < 4:
+            column_label = f"TP_SFG_{id_question}"
+        else:
+            column_label = f"TP_SCE_D{int(id_question[-1])-2}"
+        var = df_enade[column_label].iloc[0]
+        if var == 666:
+            result = True
+        else:
+            result = False
+
+    else:
+        if int(id_question) < 9:
+            column_label = "DS_VT_GAB_OFG_FIN"
+            var = df_enade[column_label].str[int(id_question)-1]
+        else:
+            column_label = "DS_VT_GAB_OCE_FIN"
+            var = df_enade[column_label].str[int(id_question)-9]
+
+        if var.iloc[0] in ["Z", "X"]:
+            result = True
+        else:
+            result = False
+    return result
+    
+
 
 def get_subjects(df: pd.DataFrame) -> np.ndarray:
     """Returns a ndarray with the unique set of subjects used in test"""
@@ -58,4 +91,14 @@ def is_question_of_subject(subject: str, row: pd.Series) -> bool:
     False otherwise"""
     boolean_array = row[["conteudo1", "conteudo2", "conteudo3"]] == subject
     return boolean_array.any()
+
+
+#def get_questions(subject: str, df: pd.DataFrame) -> List[str]:
+#    """Returns a list with ids of the questions that have 
+#    the subject"""
+#    result = []
+#    for index, row in df.iterrows():
+#        if is_question_subject(subject, row):
+#            result.append(row["idquestao"])
+#    return result
 
