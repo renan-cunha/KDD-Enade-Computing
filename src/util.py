@@ -53,3 +53,9 @@ def get_subjects(df: pd.DataFrame) -> np.ndarray:
         subjects = np.union1d(subjects, column_subjects)
     return subjects
 
+def is_question_of_subject(subject: str, row: pd.Series) -> bool:
+    """Returns True if a row/question is of subject and 
+    False otherwise"""
+    boolean_array = row[["conteudo1", "conteudo2", "conteudo3"]] == subject
+    return boolean_array.any()
+
