@@ -1,5 +1,6 @@
 import pandas as pd
 from typing import Union
+import numpy as np
 
 
 def add_correct_columns(df: pd.DataFrame) -> pd.DataFrame:
@@ -42,4 +43,13 @@ def add_correct_columns(df: pd.DataFrame) -> pd.DataFrame:
         df.loc[:, f"QUESTAO_OBJ_{i}_ACERTO"] = var
     return df
 
+
+def get_subjects(df: pd.DataFrame) -> np.ndarray:
+    """Returns a ndarray with the unique set of subjects used in test"""
+    subjects = np.zeros(0)
+    for i in range(1, 3+1):
+        column = f"conteudo{i}"
+        column_subjects = df[column].dropna().unique()
+        subjects = np.union1d(subjects, column_subjects)
+    return subjects
 
