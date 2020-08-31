@@ -1,5 +1,5 @@
 import pandas as pd
-from typing import Union
+from typing import Union, List
 import numpy as np
 
 
@@ -51,7 +51,7 @@ def is_question_cancelled(id_question: str, df_enade: pd.DataFrame) -> bool:
         [1, 35] for objective questions"""
 
     if "D" in id_question:
-        if int(id_question[-1]) < 4:
+        if int(id_question[-1]) < 3:
             column_label = f"TP_SFG_{id_question}"
         else:
             column_label = f"TP_SCE_D{int(id_question[-1])-2}"
@@ -93,12 +93,15 @@ def is_question_of_subject(subject: str, row: pd.Series) -> bool:
     return boolean_array.any()
 
 
-#def get_questions(subject: str, df: pd.DataFrame) -> List[str]:
-#    """Returns a list with ids of the questions that have 
-#    the subject"""
-#    result = []
-#    for index, row in df.iterrows():
-#        if is_question_subject(subject, row):
-#            result.append(row["idquestao"])
-#    return result
+def get_subject_valid_questions(subject: str, df_subject: pd.DataFrame,
+                                df_enade: pd.DataFrame) -> List[str]:
+    """Returns a list with ids of the questions that have 
+    the subject and that are valid"""
+    result = []
+    for index, row in df_subject.iterrows():
+        arg1 = is_question_of_subject(subject, row)
+        arg2 = not is_question_cancelled(row["idquestao"], df_enade)
+        if arg1 and arg2:
+            result.append(row["idquestao"])
+    return result
 
