@@ -3,7 +3,7 @@ from typing import Union, List
 import numpy as np
 
 
-def add_correct_columns(df: pd.DataFrame) -> pd.DataFrame:
+def add_columns_objective_score(df: pd.DataFrame) -> pd.DataFrame:
     """Adiciona uma nova coluna no DataFrame para cada questão objetiva.
     True indica que a questão foi acertada, False indica o contrário. 
     NaN indica que a questão foi anulada"""
@@ -25,7 +25,7 @@ def add_correct_columns(df: pd.DataFrame) -> pd.DataFrame:
 
     for column in used_columns:
         if column not in df.columns:
-            raise ValueError(f"A {column} não está no DataFrame")
+            raise ValueError(f"A coluna {column} não está no DataFrame")
 
     general_answer_key = df[used_columns[0]]
     specific_answer_key = df[used_columns[1]]
@@ -33,7 +33,7 @@ def add_correct_columns(df: pd.DataFrame) -> pd.DataFrame:
     general_marked = df[used_columns[2]]
     specific_marked = df[used_columns[3]]
     
-    for i in range(1, 35 + 1):
+    for i in range(1, 35 + 1): # loop pelas questoes objetivas
         if i < 9: # Indica que a questão é da formação geral
             var = return_var(general_answer_key, general_marked, i, 
                              offset = 1)
@@ -76,11 +76,10 @@ def is_question_cancelled(id_question: str, df_enade: pd.DataFrame) -> bool:
     return result
     
 
-
 def get_subjects(df: pd.DataFrame) -> np.ndarray:
     """Returns a ndarray with the unique set of subjects used in test"""
     subjects = np.zeros(0)
-    for i in range(1, 3+1):
+    for i in range(1, 3+1): #  df_subject has 3 subjects
         column = f"conteudo{i}"
         column_subjects = df[column].dropna().unique()
         subjects = np.union1d(subjects, column_subjects)
@@ -105,3 +104,20 @@ def get_subject_valid_questions(subject: str, df_subject: pd.DataFrame,
             result.append(row["idquestao"])
     return result
 
+def add_column_score_subject(subject: str, df_enade: pd.DataFrame, 
+                             df_temas: pd.DataFrame) -> pd.DataFrame:
+    questions = get_subject_valid_questions(subject, df_temas, df_enade)
+    sum_score = np.array([0.0] * df_enade.shape[0])  # number of participants
+    for question in questions:
+        if 'D' in question: # discursive question
+            numeric_id = int(question[-1])
+            if numeric_id < 3:
+                sum_score += df_enade[f"NT_FG_D{numeric_id}"]
+            else:
+                numeric_id -= 2
+                sum_score += df_enade[f"NT_CE_D{numeric_id}"]
+        else:
+            sum_score += pd.to_numeric(df_enade[f"QUESTAO_OBJ_{question}_ACERTO"]) * 100
+    sum_score /= len(questions)
+    df_enade.loc[:, f"SCORE_{subject}"] = sum_score
+    return df_enade
