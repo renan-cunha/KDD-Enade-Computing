@@ -121,3 +121,12 @@ def add_column_score_subject(subject: str, df_enade: pd.DataFrame,
     sum_score /= len(questions)
     df_enade.loc[:, f"SCORE_{subject}"] = sum_score
     return df_enade
+
+
+def add_all_score_subjects(df_enade: pd.DataFrame, 
+                           df_temas: pd.DataFrame) -> pd.DataFrame:
+    subjects = get_subjects(df_temas)
+    for subject in subjects:
+        df_enade = add_column_score_subject(subject, df_enade, df_temas)
+    return df_enade
+
