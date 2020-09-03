@@ -1,6 +1,30 @@
 import pandas as pd
 from typing import Union, List
 import numpy as np
+from src.config import NUM_ENADE_EXAM_QUESTIONS, MAX_SUBJECTS_BY_QUESTION
+
+
+
+def get_processed_subject_df() -> pd.DataFrame:
+    """Gets a clean DataFrame about the questions of ENADE, with columns such as
+       questionID, year, TypeQuestion, TypeContent, content1, content2"""
+
+    df = pd.read_csv("data/classificacao_charao.csv")
+
+    # remove spaces in contents
+    for i in range(1, MAX_SUBJECTS_BY_QUESTION + 1):
+        column_label = f'conteudo{i}'
+        df[column_label] = df[column_label].str.replace(" ", "")
+
+    # fix ID so questionID is between 1-40
+    num_questions = df.shape[0]
+    questions_id = np.linspace(0, num_questions-1, num_questions).astype(int) 
+    questions_id = questions_id % NUM_ENADE_EXAM_QUESTIONS + 1
+    df['idquestao'] = questions_id
+
+    return df.iloc[:-1][["idquestao", "ano", "curso", "prova", "tipoquestao", 
+                        "conteudo1", "conteudo2", "conteudo3"]]
+
 
 
 def add_columns_objective_score(df: pd.DataFrame) -> pd.DataFrame:
@@ -10,13 +34,20 @@ def add_columns_objective_score(df: pd.DataFrame) -> pd.DataFrame:
 
     
     def return_var(df_true: pd.DataFrame, df_marked: pd.DataFrame,
-                   index: int, offset: int) -> Union[str, bool]:
+                   index: int, offset: int) -> pd.Series:
         df_true_question = df_true.str[i - offset]
         df_marked_question = df_marked.str[i - offset]
-        if df_true_question.iloc[0] in ["Z", "X"]:
-            return ["NaN"] * df_true.shape[0]
-        else:
-            return df_true_question == df_marked_question
+
+        result = pd.Series([0]*df_true.shape[0], dtype=object)
+
+        result = df_true_question == df_marked_question
+        
+        arg1 = df_true_question == "Z"
+        arg2 = df_true_question == "X"
+        cancelled_index = arg1 | arg2
+        result[cancelled_index] = "NaN"
+
+        return result
     
     
     used_columns = ["DS_VT_GAB_OFG_FIN", "DS_VT_GAB_OCE_FIN",
