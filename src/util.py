@@ -154,10 +154,28 @@ def add_column_score_subject(subject: str, df_enade: pd.DataFrame,
     return df_enade
 
 
-def add_all_score_subjects(df_enade: pd.DataFrame, 
-                           df_temas: pd.DataFrame) -> pd.DataFrame:
+def add_column_objective_score_subject(subject: str, df_enade: pd.DataFrame, 
+                                       df_temas: pd.DataFrame) -> pd.DataFrame:
+    questions = get_subject_valid_questions(subject, df_temas, df_enade)
+    # get only objective questions
+    questions = [x for x in questions if "D" not in x]
+    sum_score = np.array([0.0] * df_enade.shape[0])  # number of participants
+    for question in questions:
+        sum_score += pd.to_numeric(df_enade[f"QUESTAO_OBJ_{question}_ACERTO"]) * 100
+    mean_score = sum_score / len(questions)
+    df_enade.loc[:, f"SCORE_OBJ_{subject}"] = mean_score
+    df_enade.loc[:, f"ACERTOS_OBJ_{subject}"] = sum_score / 100
+    return df_enade
+
+
+def add_all_score_subjects(df_enade: pd.DataFrame,
+        df_temas: pd.DataFrame, objective: bool) -> pd.DataFrame:
     subjects = get_subjects(df_temas)
     for subject in subjects:
-        df_enade = add_column_score_subject(subject, df_enade, df_temas)
+        if objective:
+            df_enade = add_column_objective_score_subject(subject, df_enade,
+                                                          df_temas)
+        else:
+            df_enade = add_column_score_subject(subject, df_enade, df_temas)
     return df_enade
 
