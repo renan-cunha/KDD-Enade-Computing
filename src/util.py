@@ -5,26 +5,6 @@ from src.config import NUM_ENADE_EXAM_QUESTIONS, MAX_SUBJECTS_BY_QUESTION
 
 
 
-def get_processed_subject_df() -> pd.DataFrame:
-    """Gets a clean DataFrame about the questions of ENADE, with columns such as
-       questionID, year, TypeQuestion, TypeContent, content1, content2"""
-
-    df = pd.read_csv("data/classificacao_charao.csv")
-
-    # remove spaces in contents
-    for i in range(1, MAX_SUBJECTS_BY_QUESTION + 1):
-        column_label = f'conteudo{i}'
-        df[column_label] = df[column_label].str.replace(" ", "")
-
-    # fix ID so questionID is between 1-40
-    num_questions = df.shape[0]
-    questions_id = np.linspace(0, num_questions-1, num_questions).astype(int) 
-    questions_id = questions_id % NUM_ENADE_EXAM_QUESTIONS + 1
-    df['idquestao'] = questions_id
-
-    return df.iloc[:-1][["idquestao", "ano", "curso", "prova", "tipoquestao", 
-                        "conteudo1", "conteudo2", "conteudo3"]]
-
 
 
 def add_columns_objective_score(df: pd.DataFrame) -> pd.DataFrame:
@@ -74,36 +54,13 @@ def add_columns_objective_score(df: pd.DataFrame) -> pd.DataFrame:
         df.loc[:, f"QUESTAO_OBJ_{i}_ACERTO"] = var
     return df
 
+
 def is_question_cancelled(id_question: str, df_enade: pd.DataFrame) -> bool:
-    """Returns True if the question is cancelled and False otherwise.
-    id_question is in the format:
-        
-        [D1, D5] for discursive questions
-        [1, 35] for objective questions"""
-
-    if "D" in id_question:
-        if int(id_question[-1]) < 3:
-            column_label = f"TP_SFG_{id_question}"
-        else:
-            column_label = f"TP_SCE_D{int(id_question[-1])-2}"
-        var = df_enade[column_label].iloc[0]
-        if var == 666:
-            result = True
-        else:
-            result = False
-
+    """Returns True if the question is cancelled and False otherwise."""
+    if df_enade[f"QUESTAO_{id_question}_NOTA"].iloc[0] == "NULA":
+        result = True
     else:
-        if int(id_question) < 9:
-            column_label = "DS_VT_GAB_OFG_FIN"
-            var = df_enade[column_label].str[int(id_question)-1]
-        else:
-            column_label = "DS_VT_GAB_OCE_FIN"
-            var = df_enade[column_label].str[int(id_question)-9]
-
-        if var.iloc[0] in ["Z", "X"]:
-            result = True
-        else:
-            result = False
+        result = False
     return result
     
 
@@ -116,6 +73,7 @@ def get_subjects(df: pd.DataFrame) -> np.ndarray:
         subjects = np.union1d(subjects, column_subjects)
     return subjects
 
+
 def is_question_of_subject(subject: str, row: pd.Series) -> bool:
     """Returns True if a row/question is of subject and 
     False otherwise"""
@@ -124,16 +82,19 @@ def is_question_of_subject(subject: str, row: pd.Series) -> bool:
 
 
 def get_subject_valid_questions(subject: str, df_subject: pd.DataFrame,
-                                df_enade: pd.DataFrame) -> List[str]:
+                                df_enade: pd.DataFrame,
+                                just_objective: bool) -> List[str]:
     """Returns a list with ids of the questions that have 
     the subject and that are valid"""
     result = []
     for index, row in df_subject.iterrows():
         arg1 = is_question_of_subject(subject, row)
         arg2 = not is_question_cancelled(row["idquestao"], df_enade)
-        if arg1 and arg2:
+        arg3 = row["tipoquestao"] == "Objetiva"
+        if arg1 and arg2 and arg3:
             result.append(row["idquestao"])
     return result
+
 
 def add_column_score_subject(subject: str, df_enade: pd.DataFrame, 
                              df_temas: pd.DataFrame) -> pd.DataFrame:
@@ -156,12 +117,19 @@ def add_column_score_subject(subject: str, df_enade: pd.DataFrame,
 
 def add_column_objective_score_subject(subject: str, df_enade: pd.DataFrame, 
                                        df_temas: pd.DataFrame) -> pd.DataFrame:
-    questions = get_subject_valid_questions(subject, df_temas, df_enade)
+    questions = get_subject_valid_questions(subject, df_temas, df_enade,
+                                            just_objective=True)
     # get only objective questions
-    questions = [x for x in questions if "D" not in x]
     sum_score = np.array([0.0] * df_enade.shape[0])  # number of participants
     for question in questions:
-        sum_score += pd.to_numeric(df_enade[f"QUESTAO_OBJ_{question}_ACERTO"]) * 100
+        question_score = df_enade[f"QUESTAO_{question}_NOTA"]
+        blank_question_score_index = question_score == "BRANCO"
+        deletion_question_score_index = question_score == "RASURA"
+        zero_score_index = blank_question_score_index | deletion_question_score_index
+        question_score[zero_score_index] = 0
+        print(sum_score.shape)
+        print(question_score.shape)
+        sum_score += pd.to_numeric(question_score)
     mean_score = sum_score / len(questions)
     df_enade.loc[:, f"SCORE_OBJ_{subject}"] = mean_score
     df_enade.loc[:, f"ACERTOS_OBJ_{subject}"] = sum_score / 100
