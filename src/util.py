@@ -90,7 +90,10 @@ def get_subject_valid_questions(subject: str, df_subject: pd.DataFrame,
     for index, row in df_subject.iterrows():
         arg1 = is_question_of_subject(subject, row)
         arg2 = not is_question_cancelled(row["idquestao"], df_enade)
-        arg3 = row["tipoquestao"] == "Objetiva"
+        if just_objective:
+            arg3 = row["tipoquestao"] == "Objetiva"
+        else:
+            arg3 = True
         if arg1 and arg2 and arg3:
             result.append(row["idquestao"])
     return result
@@ -122,15 +125,16 @@ def add_column_objective_score_subject(subject: str, df_enade: pd.DataFrame,
     # get only objective questions
     sum_score = np.array([0.0] * df_enade.shape[0])  # number of participants
     for question in questions:
-        question_score = df_enade[f"QUESTAO_{question}_NOTA"]
+        question_score = df_enade[f"QUESTAO_{question}_NOTA"].copy()
         blank_question_score_index = question_score == "BRANCO"
         deletion_question_score_index = question_score == "RASURA"
         zero_score_index = blank_question_score_index | deletion_question_score_index
         question_score[zero_score_index] = 0
-        print(sum_score.shape)
-        print(question_score.shape)
         sum_score += pd.to_numeric(question_score)
-    mean_score = sum_score / len(questions)
+    if len(questions) > 0:
+        mean_score = sum_score / len(questions)
+    else:
+        mean_score = np.full_like(a=sum_score, fill_value=np.nan)
     df_enade.loc[:, f"SCORE_OBJ_{subject}"] = mean_score
     df_enade.loc[:, f"ACERTOS_OBJ_{subject}"] = sum_score / 100
     return df_enade
