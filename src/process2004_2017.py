@@ -36,7 +36,9 @@ def get_processed_enade_2014_2017(path_csv: str) -> pd.DataFrame:
 
     question_columns = [f"QUESTAO_{i}_NOTA" for i in range(1,
                                                            NUM_ENADE_EXAM_QUESTIONS+1)]
-    columns = question_columns + [PRESENCE_COLUMN]
+    status_columns = [f"QUESTAO_{i}_STATUS" for i in range(1,
+                                                           NUM_ENADE_EXAM_QUESTIONS+1)]
+    columns = question_columns + [PRESENCE_COLUMN] + status_columns
 
     return df[columns]
 
@@ -59,7 +61,10 @@ def get_discursive_scores(df: pd.DataFrame, general: bool) -> pd.DataFrame:
         cancelled_indices = df[question_situation_label] == CODE_CANCELLED_DIS_QUESTION
 
         df.loc[blank_indices, new_column_label] = BLANK_LABEL
-        df.loc[cancelled_indices, new_column_label] = CANCELLED_LABEL
+
+        df.loc[cancelled_indices, f"QUESTAO_{i}_STATUS"] = CANCELLED_LABEL
+
+        df.loc[~cancelled_indices, f"QUESTAO_{i}_STATUS"] = "OK"
 
     return df
 
@@ -72,7 +77,7 @@ def get_objective_scores(df: pd.DataFrame, general: bool) -> pd.DataFrame:
     num_questions = NUM_OBJ_GEN_QUESTIONS if general else NUM_OBJ_SPE_QUESTIONS
     label = "FG" if general else "CE"
     for i in range(start_id, num_questions + start_id):
-        
+
         new_column_label = f"QUESTAO_{i}_NOTA"
         question_index = i - start_id
         df.loc[:, new_column_label] = df.loc[:, f"DS_VT_ACE_O{label}"].str[question_index]
@@ -89,7 +94,8 @@ def get_objective_scores(df: pd.DataFrame, general: bool) -> pd.DataFrame:
         arg2 = df.loc[:, f"DS_VT_GAB_O{label}_FIN"].str[question_index] == second_code
         arg3 = df.loc[:, f"DS_VT_GAB_O{label}_FIN"].str[question_index] == third_code
         cancelled_index = arg1 | arg2 | arg3
-        df.loc[cancelled_index, new_column_label] = CANCELLED_LABEL
+        df.loc[cancelled_index, f"QUESTAO_{i}_STATUS"] = CANCELLED_LABEL
+        df.loc[~cancelled_index, f"QUESTAO_{i}_STATUS"] = "OK"
 
     return df
 
