@@ -4,9 +4,6 @@ import numpy as np
 from src.config import NUM_ENADE_EXAM_QUESTIONS, MAX_SUBJECTS_BY_QUESTION
 
 
-
-
-
 def add_columns_objective_score(df: pd.DataFrame) -> pd.DataFrame:
     """Adiciona uma nova coluna no DataFrame para cada questão objetiva.
     True indica que a questão foi acertada, False indica o contrário. 
@@ -57,7 +54,7 @@ def add_columns_objective_score(df: pd.DataFrame) -> pd.DataFrame:
 
 def is_question_cancelled(id_question: str, df_enade: pd.DataFrame) -> bool:
     """Returns True if the question is cancelled and False otherwise."""
-    if df_enade[f"QUESTAO_{id_question}_NOTA"].iloc[0] == "NULA":
+    if df_enade[f"QUESTAO_{id_question}_STATUS"].iloc[0] == "NULA":
         result = True
     else:
         result = False

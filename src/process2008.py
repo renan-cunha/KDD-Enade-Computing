@@ -3,6 +3,7 @@ from src.config import CODE_BLANK_DIS_ANSWER, CODE_CANCELLED_DIS_QUESTION
 from src.config import BLANK_LABEL, CANCELLED_LABEL, DELETION_LABEL
 from src.config import CODE_CANCELLED_OBJ_QUESTION, CODE_COURSE, \
     NUM_ENADE_EXAM_QUESTIONS, PRESENCE_COLUMN
+from typing import Tuple
 
 
 NUM_DIS_GEN_QUESTIONS = 2
@@ -12,17 +13,23 @@ NUM_OBJ_SPE_QUESTIONS = 27
 
 
 def filter_enade_df_by_course(df: pd.DataFrame) -> pd.DataFrame:
-    return df.loc[df["CO_CURSO"] == CODE_COURSE]
+    df = df.loc[df["co_curso"] == CODE_COURSE]
+    df = df.loc[df["in_grad"] == 0]
+    print(df.shape)
+    return df
 
 
-def get_processed_enade_2011(path_csv: str) -> pd.DataFrame:
+def get_processed_enade_2008(path_csv: str) -> Tuple[pd.DataFrame,
+                                                     pd.DataFrame]:
     df = pd.read_csv(path_csv, sep=";", decimal=",",
-                              dtype={"DS_VT_ESC_OFG": str, 
-                                     "DS_VT_ESC_OCE": str,
-                                     "DS_VT_ACE_OCE": str,
-                                     "DS_VT_ACE_OFG": str,
-                                     "NT_OBJ_CE": str})
+                              dtype={"vt_esc_ofg": str,
+                                     "vt_esc_oce": str,
+                                     "vt_ace_oce": str,
+                                     "vt_ace_ofg": str,
+                                     "nt_obj_ce": str})
     df = filter_enade_df_by_course(df)
+
+
 
     df = get_objective_scores(df, general=True)
     df = get_discursive_scores(df, general=True)
@@ -33,24 +40,25 @@ def get_processed_enade_2011(path_csv: str) -> pd.DataFrame:
                                                            NUM_ENADE_EXAM_QUESTIONS+1)]
     status_columns = [f"QUESTAO_{i}_STATUS" for i in range(1,
                                                            NUM_ENADE_EXAM_QUESTIONS+1)]
-    columns = question_columns + [PRESENCE_COLUMN] + status_columns
-    return df[columns]
+    columns = question_columns + ["tp_pres"] + status_columns
+    return df[columns].copy(), df
 
     
 def get_discursive_scores(df: pd.DataFrame, general: bool) -> pd.DataFrame:
     """Creates columns for the discursive part of the test"""
     
-    start_id = 9 if general else 11
-    num_questions = NUM_DIS_GEN_QUESTIONS if general else NUM_DIS_SPE_QUESTIONS
-    label = "FG" if general else "CE"
+    general_indexes = [9, 10]
+    specific_indexes = [20, 39, 40]
+    label = "fg" if general else "ce"
+    indexes = general_indexes if general else specific_indexes
 
-    for i in range(start_id, num_questions + start_id):
+    for discursive_question_index, i in enumerate(indexes):
         new_column_label = f"QUESTAO_{i}_NOTA"
         
-        discursive_question_index = i - start_id + 1
-        df[new_column_label] = df[f"NT_{label}_D{discursive_question_index}"].copy()
+        discursive_question_index += 1
+        df[new_column_label] = df[f"nt_{label}_d{discursive_question_index}"].copy()
 
-        question_situation_label = f"TP_S{label}_D{discursive_question_index}"
+        question_situation_label = f"tp_s{label}_d{discursive_question_index}"
         blank_indices = df[question_situation_label] == CODE_BLANK_DIS_ANSWER
         cancelled_indices = df[question_situation_label] == CODE_CANCELLED_DIS_QUESTION
 
@@ -64,31 +72,27 @@ def get_discursive_scores(df: pd.DataFrame, general: bool) -> pd.DataFrame:
 def get_objective_scores(df: pd.DataFrame, general: bool) -> pd.DataFrame:
     """Creates columns for the objective part of the exam. Each column
     can have the values 0 (wrong alternative), 100 (correct), BRANCO, RASURA and 
-    NULA"""    
-    start_id = 1 if general else 14
-    num_questions = NUM_OBJ_GEN_QUESTIONS if general else NUM_OBJ_SPE_QUESTIONS
-    label = "FG" if general else "CE"
-    for i in range(start_id, num_questions + start_id):
+    NULA"""
+
+    general_indexes = list(range(1, 8 + 1))
+    specific_indexes = list(range(11, 20)) + list(range(21, 38 + 1))
+    label = "fg" if general else "ce"
+    indexes = general_indexes if general else specific_indexes
+    for question_index, i in enumerate(indexes):
         
         new_column_label = f"QUESTAO_{i}_NOTA"
-        if i >= 36: # this exame has more questions
-            question_index = i - start_id + 5
-        else:
-            question_index = i - start_id
-        df.loc[:, new_column_label] = df.loc[:, f"DS_VT_ACE_O{label}"].str[question_index].copy()
+        df.loc[:, new_column_label] = df.loc[:, f"vt_ace_o{label}"].str[question_index].copy()
         df.loc[:, new_column_label] = df.loc[:, new_column_label].astype(float) * 100
 
-        blank_index = df.loc[:, f"DS_VT_ESC_O{label}"].str[question_index] == "."
+        blank_index = df.loc[:, f"vt_esc_o{label}"].str[question_index] == "."
         df.loc[blank_index, new_column_label] = BLANK_LABEL
 
-        deletion_index = df.loc[:, f"DS_VT_ESC_O{label}"].str[question_index] == "*"
+        deletion_index = df.loc[:, f"vt_esc_o{label}"].str[question_index] == "*"
         df.loc[deletion_index, new_column_label] = DELETION_LABEL
 
-        first_code, second_code, third_code = CODE_CANCELLED_OBJ_QUESTION
-        arg1 = df.loc[:, f"DS_VT_GAB_O{label}_FIN"].str[question_index] == first_code
-        arg2 = df.loc[:, f"DS_VT_GAB_O{label}_FIN"].str[question_index] == second_code
-        arg3 = df.loc[:, f"DS_VT_GAB_O{label}_FIN"].str[question_index] == third_code
-        cancelled_index = arg1 | arg2 | arg3
+        arg1 = df.loc[:, f"vt_ace_o{label}"].str[question_index] == 8
+        arg2 = df.loc[:, f"vt_ace_o{label}"].str[question_index] == 9
+        cancelled_index = arg1 | arg2
         df.loc[cancelled_index, f"QUESTAO_{i}_STATUS"] = CANCELLED_LABEL
         df.loc[~cancelled_index, f"QUESTAO_{i}_STATUS"] = "OK"
 
