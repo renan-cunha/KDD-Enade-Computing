@@ -38,7 +38,8 @@ def get_processed_enade_2005(path_csv: str) -> Tuple[pd.DataFrame,
                                                            NUM_ENADE_EXAM_QUESTIONS+1)]
     status_columns = [f"QUESTAO_{i}_STATUS" for i in range(1,
                                                            NUM_ENADE_EXAM_QUESTIONS+1)]
-    columns = question_columns + ["tp_pres"] + status_columns
+    df["TP_PRES"] = df["tp_pres"]
+    columns = question_columns + ["TP_PRES"] + status_columns
     return df[columns].copy(), df
 
     

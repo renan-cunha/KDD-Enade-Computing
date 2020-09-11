@@ -15,7 +15,6 @@ NUM_OBJ_SPE_QUESTIONS = 27
 def filter_enade_df_by_course(df: pd.DataFrame) -> pd.DataFrame:
     df = df.loc[df["co_curso"] == CODE_COURSE]
     df = df.loc[df["in_grad"] == 0]
-    print(df.shape)
     return df
 
 
@@ -40,7 +39,8 @@ def get_processed_enade_2008(path_csv: str) -> Tuple[pd.DataFrame,
                                                            NUM_ENADE_EXAM_QUESTIONS+1)]
     status_columns = [f"QUESTAO_{i}_STATUS" for i in range(1,
                                                            NUM_ENADE_EXAM_QUESTIONS+1)]
-    columns = question_columns + ["tp_pres"] + status_columns
+    df["TP_PRES"] = df["tp_pres"]
+    columns = question_columns + ["TP_PRES"] + status_columns
     return df[columns].copy(), df
 
     

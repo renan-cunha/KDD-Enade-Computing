@@ -119,7 +119,6 @@ def add_column_objective_score_subject(subject: str, df_enade: pd.DataFrame,
                                        df_temas: pd.DataFrame) -> pd.DataFrame:
     questions = get_subject_valid_questions(subject, df_temas, df_enade,
                                             just_objective=True)
-    print(subject, questions)
     # get only objective questions
     sum_score = np.array([0.0] * df_enade.shape[0])  # number of participants
     for question in questions:
