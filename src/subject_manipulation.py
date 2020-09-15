@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from src.config import NUM_ENADE_EXAM_QUESTIONS, MAX_SUBJECTS_BY_QUESTION,\
-    SUBJECT_DF_PATH
+    SUBJECT_DF_PATH, SUBJECT_CONTENT_COLUMNS
 from typing import List
 
 # This file deals with the csv about the questions
@@ -25,8 +25,8 @@ def split_general_subjects(df: pd.DataFrame) -> None:
         raise ValueError(f"The 'objeto' column should have a maximum of 3 subjects "
                          f", instead it has {new_data.shape[1]}")
 
-    content_columns = ["conteudo1", "conteudo2", "conteudo3"]
-    df.loc[general_questions_index, content_columns] = new_data.values
+    df.loc[general_questions_index,
+           SUBJECT_CONTENT_COLUMNS] = new_data.values
 
 
 def get_processed_subject_df(include_general_subjects: bool = False) -> pd.DataFrame:
@@ -39,28 +39,26 @@ def get_processed_subject_df(include_general_subjects: bool = False) -> pd.DataF
         split_general_subjects(df)
 
     # capitalize and remove final spaces and dots in contents
-    for i in range(1, MAX_SUBJECTS_BY_QUESTION + 1):
-        column_label = f"conteudo{i}"
+    for column_label in SUBJECT_CONTENT_COLUMNS:
         df[column_label] = df[column_label].str.capitalize()
         df[column_label] = df[column_label].str.replace(".", "")
         df[column_label] = df[column_label].str.strip(" ")
 
-    # fix ID so questionID is between -2-40
+    # fix ID so questionID is between 1-40
     num_questions = df.shape[0]
+
+    if num_questions % NUM_ENADE_EXAM_QUESTIONS != 0:
+        raise ValueError(f"The number of questions should be divisible by "
+                         f"{NUM_ENADE_EXAM_QUESTIONS}. Instead, the number of "
+                         f"questions is {num_questions}")
+
     questions_id = np.linspace(0, num_questions - 1, num_questions).astype(int)
     questions_id = questions_id % NUM_ENADE_EXAM_QUESTIONS + 1
     df['idquestao'] = questions_id
 
+    # remove last line of csv because is has some typos
     return df.iloc[:-1][["idquestao", "ano", "curso", "prova", "tipoquestao",
                          "conteudo1", "conteudo2", "conteudo3"]]
-
-
-def add_general_subjects(df: pd.DataFrame) -> pd.DataFrame:
-    for row, value in enumerate(df.loc[df["prova"] == "Geral", "objeto"]):
-        values = value.split(";")
-        for index, value in enumerate(values):
-            df[f"conteudo{index+1}"].iloc[row] = value
-    return df
 
 
 def get_objective_questions(subject_df: pd.DataFrame) -> List[int]:

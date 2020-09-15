@@ -16,3 +16,4 @@ PRESENCE_COLUMN = "TP_PRES"
 DATA_DIR = "data"
 SUBJECT_DF_NAME = "classificacao_charao.csv"
 SUBJECT_DF_PATH = os.path.join(DATA_DIR, SUBJECT_DF_NAME)
+SUBJECT_CONTENT_COLUMNS = ["conteudo1", "conteudo2", "conteudo3"]
