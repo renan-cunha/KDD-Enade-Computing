@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from src.config import NUM_ENADE_EXAM_QUESTIONS, MAX_SUBJECTS_BY_QUESTION,\
+from src.config import NUM_ENADE_EXAM_QUESTIONS, MAX_SUBJECTS_PER_QUESTION,\
     SUBJECT_DF_PATH, SUBJECT_CONTENT_COLUMNS
 from typing import List
 
@@ -17,12 +17,13 @@ def split_general_subjects(df: pd.DataFrame) -> None:
     new_data = df.loc[general_questions_index, "objeto"].str.split(";",
                                                                    expand=True)
     num_columns = new_data.shape[1]
-    if num_columns < 3:
-        # add nan columns to match 3 columns in total
-        new_data[[x for x in range(num_columns, 3)]] = np.nan
+    if num_columns < MAX_SUBJECTS_PER_QUESTION:
+        # add nan columns to match MAX_SUBJECTS_PER_QUESTION columns in total
+        new_data[[x for x in range(num_columns, MAX_SUBJECTS_PER_QUESTION)]] = np.nan
 
-    if new_data.shape[1] != 3:
-        raise ValueError(f"The 'objeto' column should have a maximum of 3 subjects "
+    if new_data.shape[1] != MAX_SUBJECTS_PER_QUESTION:
+        raise ValueError(f"The 'objeto' column should have a maximum of"
+                         f" {MAX_SUBJECTS_PER_QUESTION} subjects "
                          f", instead it has {new_data.shape[1]}")
 
     df.loc[general_questions_index,
