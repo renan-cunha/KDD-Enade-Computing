@@ -1,7 +1,7 @@
 import pandas as pd
 from typing import Union, List
 import numpy as np
-from src.config import NUM_ENADE_EXAM_QUESTIONS, MAX_SUBJECTS_BY_QUESTION
+from src.config import NUM_ENADE_EXAM_QUESTIONS, MAX_SUBJECTS_PER_QUESTION
 
 
 def add_columns_objective_score(df: pd.DataFrame) -> pd.DataFrame:

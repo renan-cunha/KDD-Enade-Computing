@@ -35,6 +35,7 @@ def get_processed_subject_df(include_general_subjects: bool = False) -> pd.DataF
        questionID, year, TypeQuestion, TypeContent, content1, content2, content3"""
 
     df = pd.read_csv(SUBJECT_DF_PATH)
+    df = df.iloc[:-1]
 
     if include_general_subjects:
         split_general_subjects(df)
@@ -58,7 +59,7 @@ def get_processed_subject_df(include_general_subjects: bool = False) -> pd.DataF
     df['idquestao'] = questions_id
 
     # remove last line of csv because is has some typos
-    return df.iloc[:-1][["idquestao", "ano", "curso", "prova", "tipoquestao",
+    return df[["idquestao", "ano", "curso", "prova", "tipoquestao",
                          "conteudo1", "conteudo2", "conteudo3"]]
 
 
