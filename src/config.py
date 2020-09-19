@@ -1,5 +1,6 @@
 import os
 
+DIR_PATH = os.path.join(os.path.dirname(__file__), "../")
 NUM_ENADE_EXAM_QUESTIONS = 40
 MAX_SUBJECTS_PER_QUESTION = 3
 CODE_BLANK_DIS_ANSWER = 333

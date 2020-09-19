@@ -19,7 +19,8 @@ def split_general_subjects(df: pd.DataFrame) -> None:
     num_columns = new_data.shape[1]
     if num_columns < MAX_SUBJECTS_PER_QUESTION:
         # add nan columns to match MAX_SUBJECTS_PER_QUESTION columns in total
-        new_data[[x for x in range(num_columns, MAX_SUBJECTS_PER_QUESTION)]] = np.nan
+        columns = [x for x in range(num_columns, MAX_SUBJECTS_PER_QUESTION)]
+        new_data[columns] = np.nan
 
     if new_data.shape[1] != MAX_SUBJECTS_PER_QUESTION:
         raise ValueError(f"The 'objeto' column should have a maximum of"
@@ -30,21 +31,26 @@ def split_general_subjects(df: pd.DataFrame) -> None:
            SUBJECT_CONTENT_COLUMNS] = new_data.values
 
 
-def get_processed_subject_df(include_general_subjects: bool = False) -> pd.DataFrame:
+def get_processed_subject_df(path_csv: str,
+                             include_general_subjects: bool = False) -> pd.DataFrame:
     """Gets a clean DataFrame about the questions of ENADE, with columns such as
        questionID, year, TypeQuestion, TypeContent, content1, content2, content3"""
 
-    df = pd.read_csv(SUBJECT_DF_PATH)
+    df = pd.read_csv(path_csv, dtype={
+                                       "conteudo1": str})
     df = df.iloc[:-1]
+    df["ano"] = df["ano"].astype(int)
 
     if include_general_subjects:
         split_general_subjects(df)
 
     # capitalize and remove final spaces and dots in contents
     for column_label in SUBJECT_CONTENT_COLUMNS:
-        df[column_label] = df[column_label].str.capitalize()
-        df[column_label] = df[column_label].str.replace(".", "")
-        df[column_label] = df[column_label].str.strip(" ")
+        not_na_index = ~df[column_label].isna()
+        if any(not_na_index):
+            df[column_label] = df[column_label].str.capitalize()
+            df[column_label] = df[column_label].str.replace(".", "")
+            df[column_label] = df[column_label].str.strip(" ")
 
     # fix ID so questionID is between 1-40
     num_questions = df.shape[0]
@@ -59,8 +65,9 @@ def get_processed_subject_df(include_general_subjects: bool = False) -> pd.DataF
     df['idquestao'] = questions_id
 
     # remove last line of csv because is has some typos
-    return df[["idquestao", "ano", "curso", "prova", "tipoquestao",
-                         "conteudo1", "conteudo2", "conteudo3"]]
+    return df[["idquestao", "prova",
+                         "conteudo1", "conteudo2", "conteudo3", "ano", "curso",
+               "tipoquestao"]]
 
 
 def get_objective_questions(subject_df: pd.DataFrame) -> List[int]:
