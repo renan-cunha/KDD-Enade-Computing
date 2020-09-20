@@ -73,3 +73,7 @@ def get_processed_subject_df(path_csv: str,
 def get_objective_questions(subject_df: pd.DataFrame) -> List[int]:
     return subject_df.loc[subject_df["tipoquestao"]=="Objetiva",
                           "idquestao"].tolist()
+
+def get_discursive_questions(subject_df: pd.DataFrame) -> List[int]:
+    return subject_df.loc[subject_df["tipoquestao"]=="Discursiva",
+                          "idquestao"].tolist()
