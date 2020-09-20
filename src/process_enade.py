@@ -30,9 +30,8 @@ def get_old_enade_dir(year: int) -> str:
 
 def pre_process_old(df: pd.DataFrame) -> pd.DataFrame:
     df.columns = [x.upper() for x in df.columns]
-    columns_to_rename = ["vt_esc_ofg", "vt_esc_oce", "vt_ace_oce",
-                         "vt_ace_ofg", "nt_obj_ce"]
-    columns_to_rename = list(map(lambda x: x.upper(), columns_to_rename))
+    columns_to_rename = ["VT_ESC_OFG", "VT_ESC_OCE", "VT_ACE_OCE",
+                         "VT_ACE_OFG"]
     df[[f"DS_{x}" for x in columns_to_rename]] = df[columns_to_rename]
     return df
 
