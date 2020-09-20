@@ -13,6 +13,4 @@ def test_pre_process_old() -> None:
     input_df = pd.read_csv(StringIO(input_csv))
     output_df = pre_process_old(input_df)
     expected_df = pd.read_csv(StringIO(output_csv))
-    print(output_df)
-    print(expected_df)
     assert output_df.equals(expected_df)
