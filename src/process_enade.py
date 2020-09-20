@@ -3,7 +3,8 @@ import pandas as pd
 from abc import ABC, abstractmethod
 from src.config import NUM_ENADE_EXAM_QUESTIONS, PRESENCE_COLUMN, CODE_COURSE, \
     ENADE_DATA_DIR, CODE_BLANK_DIS_ANSWER, CODE_CANCELLED_DIS_QUESTION, \
-    BLANK_LABEL, CANCELLED_LABEL, DELETION_LABEL, CODE_CANCELLED_OBJ_QUESTION
+    BLANK_LABEL, CANCELLED_LABEL, DELETION_LABEL, CODE_CANCELLED_OBJ_QUESTION, \
+    SENIOR_STUDENT_CODE
 import os
 
 
@@ -12,11 +13,11 @@ def filter_enade_df_by_course(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def filter_senior_students(df: pd.DataFrame) -> pd.DataFrame:
-    return df.loc[df["IN_GRAD"] == 0]
+    return df.loc[df["IN_GRAD"] == SENIOR_STUDENT_CODE]
 
 
 def get_recent_enade_dir(year: int) -> str:
-    """Used for enade 20017, 2014 and 2011"""
+    """Used for enade 2017, 2014 and 2011"""
     return os.path.join(ENADE_DATA_DIR, f"enade{year}", "3.DADOS",
                         f"MICRODADOS_ENADE_{year}.txt")
 
