@@ -1,7 +1,19 @@
 import pandas as pd
 from typing import Union, List
 import numpy as np
-from src.config import NUM_ENADE_EXAM_QUESTIONS, MAX_SUBJECTS_PER_QUESTION
+from src.config import NUM_ENADE_EXAM_QUESTIONS, MAX_SUBJECTS_PER_QUESTION, \
+    STUDENT_CODE_ABSENT, STUDENT_CODE_PRESENT
+
+
+def map_presence(df: pd.DataFrame) -> None:
+    new_mapping = df["TP_PRES"].map({STUDENT_CODE_ABSENT: "Ausente",
+                                     STUDENT_CODE_PRESENT: "Presente"}).values
+    df.loc[:, "TP_PRES"] = new_mapping
+
+
+def filter_present_students(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.loc[df["TP_PRES"] == "Presente"]
+    return df
 
 
 def add_columns_objective_score(df: pd.DataFrame) -> pd.DataFrame:
@@ -64,7 +76,7 @@ def is_question_cancelled(id_question: str, df_enade: pd.DataFrame) -> bool:
 def get_subjects(df: pd.DataFrame) -> np.ndarray:
     """Returns a ndarray with the unique set of subjects used in test"""
     subjects = np.zeros(0)
-    for i in range(1, 3+1): #  df_subject has 3 subjects
+    for i in range(1, MAX_SUBJECTS_PER_QUESTION+1): #  df_subject has 3 subjects
         column = f"conteudo{i}"
         column_subjects = df[column].dropna().unique()
         subjects = np.union1d(subjects, column_subjects)
@@ -131,14 +143,15 @@ def add_column_objective_score_subject(subject: str, df_enade: pd.DataFrame,
     if len(questions) > 0:
         mean_score = sum_score / len(questions)
     else:
+        # in case the subject doesn't have questions
         mean_score = np.full_like(a=sum_score, fill_value=np.nan)
     df_enade.loc[:, f"SCORE_OBJ_{subject}"] = mean_score
     df_enade.loc[:, f"ACERTOS_OBJ_{subject}"] = sum_score / 100
     return df_enade
 
 
-def add_all_score_subjects(df_enade: pd.DataFrame,
-        df_temas: pd.DataFrame, objective: bool) -> pd.DataFrame:
+def add_all_score_subjects(df_enade: pd.DataFrame, df_temas: pd.DataFrame,
+                           objective: bool) -> pd.DataFrame:
     subjects = get_subjects(df_temas)
     for subject in subjects:
         if objective:
