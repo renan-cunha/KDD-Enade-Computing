@@ -109,13 +109,7 @@ class ProcessEnade(ABC):
             digit_index = df.loc[:, new_column_label] == "1"
             if digit_index.any():
                 df.loc[digit_index, new_column_label] = df.loc[digit_index,
-                                                               new_column_label].astype(float)*100
-
-            blank_index = df.loc[:, f"DS_VT_ESC_O{test_label}"].str[question_label] == "."
-            df.loc[blank_index, new_column_label] = BLANK_LABEL
-
-            deletion_index = df.loc[:, f"DS_VT_ESC_O{test_label}"].str[question_label] == "*"
-            df.loc[deletion_index, new_column_label] = DELETION_LABEL
+                                                               new_column_label].astype(int)*100
 
             first_code, second_code = CODE_CANCELLED_OBJ_QUESTION
             arg1 = df.loc[:, f"DS_VT_ACE_O{test_label}"].str[question_label] == first_code
@@ -123,6 +117,13 @@ class ProcessEnade(ABC):
             cancelled_index = arg1 | arg2
             df.loc[cancelled_index, f"QUESTAO_{id}_STATUS"] = CANCELLED_LABEL
             df.loc[~cancelled_index, f"QUESTAO_{id}_STATUS"] = "OK"
+            df.loc[cancelled_index, new_column_label] = CANCELLED_LABEL
+
+            blank_index = df.loc[:, f"DS_VT_ESC_O{test_label}"].str[question_label] == "."
+            df.loc[blank_index, new_column_label] = BLANK_LABEL
+
+            deletion_index = df.loc[:, f"DS_VT_ESC_O{test_label}"].str[question_label] == "*"
+            df.loc[deletion_index, new_column_label] = DELETION_LABEL
 
         return df
 
