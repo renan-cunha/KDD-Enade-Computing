@@ -2,7 +2,7 @@ import pandas as pd
 from typing import Union, List
 import numpy as np
 from src.config import NUM_ENADE_EXAM_QUESTIONS, MAX_SUBJECTS_PER_QUESTION, \
-    STUDENT_CODE_ABSENT, STUDENT_CODE_PRESENT
+    STUDENT_CODE_ABSENT, STUDENT_CODE_PRESENT, BLANK_LABEL, DELETION_LABEL
 
 
 def map_presence(df: pd.DataFrame) -> None:
@@ -135,8 +135,8 @@ def add_column_objective_score_subject(subject: str, df_enade: pd.DataFrame,
     sum_score = np.array([0.0] * df_enade.shape[0])  # number of participants
     for question in questions:
         question_score = df_enade[f"QUESTAO_{question}_NOTA"].copy()
-        blank_question_score_index = question_score == "BRANCO"
-        deletion_question_score_index = question_score == "RASURA"
+        blank_question_score_index = question_score == BLANK_LABEL
+        deletion_question_score_index = question_score == DELETION_LABEL
         zero_score_index = blank_question_score_index | deletion_question_score_index
         question_score[zero_score_index] = 0
         sum_score += pd.to_numeric(question_score)
