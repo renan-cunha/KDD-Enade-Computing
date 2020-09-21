@@ -31,6 +31,6 @@ class ProcessEnade2014_2017(ProcessEnade):
         return filter_enade_df_by_course(df)
 
     def set_year(self, year: int) -> None:
-        if year != 2014 or year != 2017:
+        if year != 2014 and year != 2017:
             raise ValueError(f"Year should be 2014 or 2017, not {year}")
         self.path_csv = get_recent_enade_dir(year)
