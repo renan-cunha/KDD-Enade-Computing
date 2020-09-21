@@ -88,3 +88,18 @@ def test_objective_scores(input: str, expected: str, key: bool, gen_ids: list,
     output_df = process_2017.get_objective_scores(input_df, key)
     output_df = output_df.astype(str)
     assert output_df.equals(expected_df)
+
+
+def test_set_year_raise():
+    process2017 = ProcessEnade2014_2017(2017)
+    with pytest.raises(ValueError):
+        process2017.set_year(2015)
+
+
+set_year_data = [2017, 2014]
+@pytest.mark.parametrize("year", set_year_data)
+def test_set_year(year: int) -> None:
+    process2017 = ProcessEnade2014_2017(abs(year-3))
+    process2017.set_year(year)
+
+
