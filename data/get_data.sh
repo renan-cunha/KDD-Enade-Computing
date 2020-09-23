@@ -1,5 +1,5 @@
 # enade data
-mkdir enade
+mkdir -p enade
 
 
 curl http://download.inep.gov.br/microdados/Enade_Microdados/microdados_enade_2005.zip --output microdados_enade_2005.zip
