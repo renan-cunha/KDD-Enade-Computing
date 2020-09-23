@@ -14,11 +14,14 @@ numpy == 1.17.4
 # src/process_enade.py: 2
 # src/subject_manipulation.py: 1
 # src/util.py: 1
+# test/test_process_enade.py: 5
 # test/test_subject_manipulation.py: 2
+# test/test_util.py: 3
 pandas == 1.1.1
 
+# test/test_process_enade.py: 1
 # test/test_subject_manipulation.py: 1
+# test/test_util.py: 1
 pytest == 3.3.2
-matplotlib
-seaborn
-
+matplotlib == 3.1.2
+seaborn == 0.9.0
