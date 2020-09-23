@@ -28,6 +28,12 @@ bash get_data.sh
 jupyter notebook main.ipynb
 ```
 
+#### Running the Tests
+
+```bash
+pytest-3 tests/
+```
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/renan-cunha/KDD-HigherEduBR/blob/master/LICENSE) file 
