@@ -1,6 +1,6 @@
 import pandas as pd
-from src.process_enade import filter_enade_df_by_course, filter_senior_students, \
-    ProcessEnade, get_old_enade_dir, pre_process_old
+from src.process_enade import filter_enade_df_by_ufpa_course, filter_senior_students, \
+    ProcessEnade, get_old_enade_dir, pre_process_old, filter_enade_df_by_course_old
 
 
 class ProcessEnade2008(ProcessEnade):
@@ -18,6 +18,7 @@ class ProcessEnade2008(ProcessEnade):
     SPE_OBJ_QUESTIONS_LABEL = list(range(len(SPE_OBJ_QUESTIONS_ID)))
 
     path_csv = get_old_enade_dir(2008)
+    CODE_COURSE = 40
 
     def read_csv(self) -> pd.DataFrame:
         return pd.read_csv(self.path_csv, sep=";", decimal=",",
@@ -25,11 +26,15 @@ class ProcessEnade2008(ProcessEnade):
                                 "vt_esc_oce": str,
                                 "vt_ace_oce": str,
                                 "vt_ace_ofg": str,
-                                "nt_obj_ce": str})
+                                "nt_obj_ce": str,
+                                "co_grupo": int})
 
     def pre_process(self, df: pd.DataFrame) -> pd.DataFrame:
         df = pre_process_old(df)
-        df = filter_enade_df_by_course(df)
         return filter_senior_students(df)
+
+    def filter_enade_df_by_course(self, df: pd.DataFrame) -> pd.DataFrame:
+        return filter_enade_df_by_course_old(df)
+
 
 

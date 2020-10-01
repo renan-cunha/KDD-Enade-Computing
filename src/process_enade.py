@@ -1,15 +1,24 @@
 from typing import List, Callable
 import pandas as pd
 from abc import ABC, abstractmethod
-from src.config import NUM_ENADE_EXAM_QUESTIONS, PRESENCE_COLUMN, CODE_COURSE, \
+from src.config import NUM_ENADE_EXAM_QUESTIONS, PRESENCE_COLUMN, \
+    CODE_UFPA_COURSE,  \
     ENADE_DATA_DIR, CODE_BLANK_DIS_ANSWER, CODE_CANCELLED_DIS_QUESTION, \
     BLANK_LABEL, CANCELLED_LABEL, DELETION_LABEL, CODE_CANCELLED_OBJ_QUESTION, \
-    SENIOR_STUDENT_CODE
+    SENIOR_STUDENT_CODE, CODE_COURSE_NEW, CODE_COURSE_OLD
 import os
 
 
-def filter_enade_df_by_course(df: pd.DataFrame) -> pd.DataFrame:
-    return df.loc[df["CO_CURSO"] == CODE_COURSE]
+def filter_enade_df_by_ufpa_course(df: pd.DataFrame) -> pd.DataFrame:
+    return df.loc[df["CO_CURSO"] == CODE_UFPA_COURSE]
+
+
+def filter_enade_df_by_course_new(df: pd.DataFrame) -> pd.DataFrame:
+    return df.loc[df["CO_GRUPO"] == CODE_COURSE_NEW]
+
+
+def filter_enade_df_by_course_old(df: pd.DataFrame) -> pd.DataFrame:
+    return df.loc[df["CO_SUBAREA"] == CODE_COURSE_OLD]
 
 
 def filter_senior_students(df: pd.DataFrame) -> pd.DataFrame:
@@ -50,6 +59,7 @@ class ProcessEnade(ABC):
     SPE_OBJ_QUESTIONS_ID = [0]
     SPE_OBJ_QUESTIONS_LABEL = [0]
     path_csv = ""
+    CODE_COURSE = None
 
     @abstractmethod
     def read_csv(self) -> pd.DataFrame:
@@ -127,10 +137,18 @@ class ProcessEnade(ABC):
 
         return df
 
-    def get_data(self) -> pd.DataFrame:
+    @abstractmethod
+    def filter_enade_df_by_course(self, df: pd.DataFrame) -> pd.DataFrame:
+        pass
+
+    def get_data(self, filter_by_ufpa: bool = True) -> pd.DataFrame:
 
         df = self.read_csv()
         df = self.pre_process(df)
+        if filter_by_ufpa:
+            df = filter_enade_df_by_ufpa_course(df)
+        else:
+            df = self.filter_enade_df_by_course(df)
 
         df = self.get_objective_scores(df, general=True)
         df = self.get_discursive_scores(df, general=True)

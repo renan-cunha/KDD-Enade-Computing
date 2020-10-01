@@ -1,6 +1,6 @@
 import pandas as pd
-from src.process_enade import filter_enade_df_by_course, get_recent_enade_dir, \
-    ProcessEnade
+from src.process_enade import filter_enade_df_by_ufpa_course, get_recent_enade_dir, \
+    ProcessEnade, filter_enade_df_by_course_new
 
 
 class ProcessEnade2014_2017(ProcessEnade):
@@ -28,7 +28,10 @@ class ProcessEnade2014_2017(ProcessEnade):
                                    "DS_VT_ACE_OFG": str})
 
     def pre_process(self, df: pd.DataFrame) -> pd.DataFrame:
-        return filter_enade_df_by_course(df)
+        return df
+
+    def filter_enade_df_by_course(self, df: pd.DataFrame) -> pd.DataFrame:
+        return filter_enade_df_by_course_new(df)
 
     def set_year(self, year: int) -> None:
         if year != 2014 and year != 2017:

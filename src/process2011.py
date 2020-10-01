@@ -1,6 +1,6 @@
 import pandas as pd
-from src.process_enade import filter_enade_df_by_course, ProcessEnade, \
-    get_recent_enade_dir
+from src.process_enade import filter_enade_df_by_ufpa_course, ProcessEnade, \
+    get_recent_enade_dir, filter_enade_df_by_course_new
 import numpy as np
 
 
@@ -31,5 +31,7 @@ class ProcessEnade2011(ProcessEnade):
                         "NT_OBJ_CE": str})
 
     def pre_process(self, df: pd.DataFrame) -> pd.DataFrame:
-        return filter_enade_df_by_course(df)
+        return df
 
+    def filter_enade_df_by_course(self, df: pd.DataFrame) -> pd.DataFrame:
+        return filter_enade_df_by_course_new(df)

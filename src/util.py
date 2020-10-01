@@ -1,8 +1,9 @@
 import pandas as pd
-from typing import Union, List
+from typing import Union, List, Callable
 import numpy as np
 from src.config import NUM_ENADE_EXAM_QUESTIONS, MAX_SUBJECTS_PER_QUESTION, \
-    STUDENT_CODE_ABSENT, STUDENT_CODE_PRESENT, BLANK_LABEL, DELETION_LABEL
+    STUDENT_CODE_ABSENT, STUDENT_CODE_PRESENT, BLANK_LABEL, DELETION_LABEL, \
+    DIFFICULTIES
 
 
 def map_presence(df: pd.DataFrame) -> None:
@@ -127,11 +128,9 @@ def add_column_score_subject(subject: str, df_enade: pd.DataFrame,
     return df_enade
 
 
-def add_column_objective_score_subject(subject: str, df_enade: pd.DataFrame, 
-                                       df_temas: pd.DataFrame) -> pd.DataFrame:
-    questions = get_subject_valid_questions(subject, df_temas, df_enade,
-                                            just_objective=True)
-    # get only objective questions
+def add_column_objective_score_category(category: str, df_enade: pd.DataFrame,
+                                        questions: List[str]) -> pd.DataFrame:
+    """Assumes valid questions"""
     sum_score = np.array([0.0] * df_enade.shape[0])  # number of participants
     for question in questions:
         question_score = df_enade[f"QUESTAO_{question}_NOTA"].copy()
@@ -145,8 +144,24 @@ def add_column_objective_score_subject(subject: str, df_enade: pd.DataFrame,
     else:
         # in case the subject doesn't have questions
         mean_score = np.full_like(a=sum_score, fill_value=np.nan)
-    df_enade.loc[:, f"SCORE_OBJ_{subject}"] = mean_score
-    df_enade.loc[:, f"ACERTOS_OBJ_{subject}"] = sum_score / 100
+    df_enade.loc[:, f"SCORE_OBJ_{category}"] = mean_score
+    df_enade.loc[:, f"ACERTOS_OBJ_{category}"] = sum_score / 100
+    return df_enade
+
+
+def add_all_score_categories(df_enade: pd.DataFrame,
+                             df_categories: pd.DataFrame,
+                             objective: bool,
+                             categories: List[str],
+                             get_questions_function: Callable) -> pd.DataFrame:
+    for category in categories:
+        if objective:
+            questions = get_questions_function(category, df_categories,
+                                               df_enade, just_objective=True)
+            df_enade = add_column_objective_score_category(category, df_enade,
+                                                           questions)
+        else:
+            raise NotImplemented
     return df_enade
 
 
@@ -155,9 +170,36 @@ def add_all_score_subjects(df_enade: pd.DataFrame, df_temas: pd.DataFrame,
     subjects = get_subjects(df_temas)
     for subject in subjects:
         if objective:
-            df_enade = add_column_objective_score_subject(subject, df_enade,
-                                                          df_temas)
+            questions = get_subject_valid_questions(subject, df_temas, df_enade,
+                                                    just_objective=True)
+            df_enade = add_column_objective_score_category(subject, df_enade,
+                                                           questions)
         else:
             df_enade = add_column_score_subject(subject, df_enade, df_temas)
     return df_enade
 
+
+def add_all_score_difficulties(df_enade: pd.DataFrame,
+                               df_difficulty: pd.DataFrame) -> pd.DataFrame:
+    for difficulty in DIFFICULTIES:
+        questions = get_difficulty_valid_questions(difficulty, df_difficulty,
+                                                   df_enade)
+        df_enade = add_column_objective_score_category(difficulty, df_enade,
+                                                       questions)
+    return df_enade
+
+
+def get_difficulty_valid_questions(diffculty: str, df_difficulty: pd.DataFrame,
+                                   df_enade: pd.DataFrame,
+                                   just_objective: bool = True) -> List[str]:
+    """Returns a list with ids of the questions that are of the difficulty and
+    that are valid"""
+    if not just_objective:
+        raise ValueError("Only objective questions have difficulty")
+    result = []
+    for index, row in df_difficulty.iterrows():
+        arg1 = row["dificuldade"] == diffculty
+        arg2 = not is_question_cancelled(row["idquestao"], df_enade)
+        if arg1 and arg2:
+            result.append(row["idquestao"])
+    return result
