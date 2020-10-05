@@ -17,7 +17,6 @@ class ProcessEnade2005(ProcessEnade):
     SPE_OBJ_QUESTIONS_ID = list(range(11, 24 + 1)) + list(range(26, 39 + 1))
     SPE_OBJ_QUESTIONS_LABEL = list(range(28, len(SPE_OBJ_QUESTIONS_ID) + 28))
 
-
     path_csv = get_old_enade_dir(2005)
 
     def read_csv(self) -> pd.DataFrame:
@@ -34,4 +33,22 @@ class ProcessEnade2005(ProcessEnade):
         return filter_senior_students(df)
 
     def filter_enade_df_by_course(self, df: pd.DataFrame) -> pd.DataFrame:
-        return filter_enade_df_by_course_old(df)
+
+        def is_computer_science(ace: str) -> bool:
+            # these are the questions restricted to CC course
+            start = "............................"
+            end = ".............."
+            if type(ace) == float:
+                return False
+            if ace.startswith(start) and ace.endswith(end):
+                # if it has at least one answer different than blank
+                return True
+            else:
+                return False
+
+        df = df.loc[df["CO_GRUPO"] == 40]
+        boolean_index = df["DS_VT_ACE_OCE"].apply(is_computer_science)
+        return df.loc[boolean_index]
+
+
+

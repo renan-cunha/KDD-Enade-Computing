@@ -18,7 +18,6 @@ class ProcessEnade2008(ProcessEnade):
     SPE_OBJ_QUESTIONS_LABEL = list(range(len(SPE_OBJ_QUESTIONS_ID)))
 
     path_csv = get_old_enade_dir(2008)
-    CODE_COURSE = 40
 
     def read_csv(self) -> pd.DataFrame:
         return pd.read_csv(self.path_csv, sep=";", decimal=",",
