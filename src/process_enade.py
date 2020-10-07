@@ -141,6 +141,14 @@ class ProcessEnade(ABC):
     def filter_enade_df_by_course(self, df: pd.DataFrame) -> pd.DataFrame:
         pass
 
+    def filter_anomalies(self, df: pd.DataFrame) -> pd.DataFrame:
+        """This function filters the students that were present but have
+        missing values"""
+        arg1 = df["DS_VT_ESC_OCE"].isna()
+        arg2 = df["TP_PRES"] == 555
+        boolean_index = ~(arg1 & arg2)
+        return df.loc[boolean_index]
+
     def get_data(self, filter_by_ufpa: bool = True) -> pd.DataFrame:
 
         df = self.read_csv()
@@ -149,6 +157,7 @@ class ProcessEnade(ABC):
             df = filter_enade_df_by_ufpa_course(df)
         else:
             df = self.filter_enade_df_by_course(df)
+            df = self.filter_anomalies(df)
 
         df = self.get_objective_scores(df, general=True)
         df = self.get_discursive_scores(df, general=True)
