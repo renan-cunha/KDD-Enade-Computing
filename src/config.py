@@ -3,6 +3,23 @@ import os
 CODE_COURSE_NEW = 4004
 CODE_COURSE_OLD = 4001
 DIFFICULTIES = ["muito facil", "facil", "medio", "dificil", "muito dificil"]
+MATH_SUBJECTS = ["Lógica e matemática discreta",
+                 "Lógica e matemática discreta"]
+COMPUTING_SUBJECTS = ["Algoritmos e estruturas de dados",
+                      "Arquitetura de computadores e sistemas operacionais",
+                      "Sistemas digitais",
+                      "Paradigmas de linguagens de programação",
+                      "Teoria da computação",
+                      "Teoria dos grafos",
+                      "Fundamentos e técnicas de programação"]
+TECHNOLOGY_SUBJECTS = ["Banco de dados",
+                       "Compiladores",
+                       "Computação gráfica e processamento de imagem",
+                       "Engenharia de software e interação homem-computador",
+                       "Inteligência artificial e computacional",
+                       "Redes de computadores",
+                       "Sistemas distribuídos"]
+HUMAN_SUBJECTS = ["Ética, computador e sociedade"]
 SENIOR_STUDENT_CODE = 0
 DIR_PATH = os.path.join(os.path.dirname(__file__), "../")
 NUM_ENADE_EXAM_QUESTIONS = 40
