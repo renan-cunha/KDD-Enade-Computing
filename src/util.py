@@ -4,6 +4,10 @@ import numpy as np
 from src.config import NUM_ENADE_EXAM_QUESTIONS, MAX_SUBJECTS_PER_QUESTION, \
     STUDENT_CODE_ABSENT, STUDENT_CODE_PRESENT, BLANK_LABEL, DELETION_LABEL, \
     DIFFICULTIES
+from src.process2014_2017 import ProcessEnade2014_2017
+from src.process2011 import ProcessEnade2011
+from src.process2008 import ProcessEnade2008
+from src.process2005 import ProcessEnade2005
 
 
 def map_presence(df: pd.DataFrame) -> None:
@@ -93,13 +97,21 @@ def is_question_of_subject(subject: str, row: pd.Series) -> bool:
 
 def get_subject_valid_questions(subject: str, df_subject: pd.DataFrame,
                                 df_enade: pd.DataFrame,
-                                just_objective: bool) -> List[str]:
+                                just_objective: bool, 
+                                type_questions: str = "valid") -> List[str]:
     """Returns a list with ids of the questions that have 
-    the subject and that are valid"""
+    the subject"""
     result = []
     for index, row in df_subject.iterrows():
         arg1 = is_question_of_subject(subject, row)
         arg2 = not is_question_cancelled(row["idquestao"], df_enade)
+
+        if type_questions == "invalid":
+            arg2 = not arg2
+        elif type_questions != "valid":
+            raise ValueError(f"The type_question argumento should be 'valid'"
+                             f" or invalid")
+
         if just_objective:
             arg3 = row["tipoquestao"] == "Objetiva"
         else:
@@ -107,6 +119,43 @@ def get_subject_valid_questions(subject: str, df_subject: pd.DataFrame,
         if arg1 and arg2 and arg3:
             result.append(row["idquestao"])
     return result
+
+def get_validity_questions_df_year(df_subject: pd.DataFrame, 
+                               df_enade_year: pd.DataFrame, 
+                               just_objective: bool) -> pd.DataFrame:
+    """Return a df with index as subjects, and columns of valid and invalid"""
+    subjects = get_subjects(df_subject)
+    result = pd.DataFrame(index=subjects, columns = ["valid", "invalid"])
+    for subject in subjects:
+
+        valid_questions = get_subject_valid_questions(subject, df_subject,
+                                                      df_enade_year,
+                                                      just_objective, 'valid')
+        invalid_questions = get_subject_valid_questions(subject, df_subject,
+                                                        df_enade_year,
+                                                        just_objective, 
+                                                        'invalid')
+        result.loc[subject, :] = [len(valid_questions), len(invalid_questions)]
+    return result
+
+def get_validity_questions_df_all_years(df_subject: pd.DataFrame,
+                                        dfs_enade: pd.DataFrame,
+                                        just_objective: bool=True) -> pd.DataFrame:
+    subjects = get_subjects(df_subject)
+    years = dfs_enade.keys()
+    result = pd.DataFrame(0, index=subjects, columns=["valid", "invalid"])
+    for year in years:
+        df_subject_year = df_subject.loc[df_subject["ano"] == year]
+        df_enade_year = dfs_enade[year]
+        
+        validity_questions_year = get_validity_questions_df_year(df_subject_year,
+                                                      df_enade_year,
+                                                      just_objective)
+        index_year = validity_questions_year.index
+        result.loc[index_year] += validity_questions_year
+    return result
+
+
 
 
 def add_column_score_subject(subject: str, df_enade: pd.DataFrame, 
@@ -203,3 +252,17 @@ def get_difficulty_valid_questions(diffculty: str, df_difficulty: pd.DataFrame,
         if arg1 and arg2:
             result.append(row["idquestao"])
     return result
+
+
+def get_dict_all_years(filter_by_ufpa: bool) -> dict:
+    """Return a dict with keys as year, and values as enade_df"""
+    enade_2017 = ProcessEnade2014_2017(2017).get_data(filter_by_ufpa)
+    enade_2014 = ProcessEnade2014_2017(2014).get_data(filter_by_ufpa)
+    enade_2011 = ProcessEnade2011().get_data(filter_by_ufpa)
+    enade_2008 = ProcessEnade2008().get_data(filter_by_ufpa)
+    enade_2005 = ProcessEnade2005().get_data(filter_by_ufpa)
+    return {2017: enade_2017, 
+            2014: enade_2014, 
+            2011: enade_2011,
+            2008: enade_2008,
+            2005: enade_2005}
