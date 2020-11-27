@@ -4,7 +4,7 @@ CODE_COURSE_NEW = 4004
 CODE_COURSE_OLD = 4001
 DIFFICULTIES = ["muito facil", "facil", "medio", "dificil", "muito dificil"]
 MATH_SUBJECTS = ["Lógica e matemática discreta",
-                 "Probabilidade e estatística"]
+                 ce"Probabilidade e estatística"]
 COMPUTING_SUBJECTS = ["Algoritmos e estruturas de dados",
                       "Arquitetura de computadores e sistemas operacionais",
                       "Sistemas digitais",
