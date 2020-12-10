@@ -1,7 +1,7 @@
 # data
 .idea/
 enade/
-data/
+/data/
 .zip
 
 # Byte-compiled / optimized / DLL files
