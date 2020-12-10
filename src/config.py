@@ -1,10 +1,11 @@
 import os
 
+years = [2017, 2014, 2011, 2008, 2005]
 CODE_COURSE_NEW = 4004
 CODE_COURSE_OLD = 4001
 DIFFICULTIES = ["muito facil", "facil", "medio", "dificil", "muito dificil"]
 MATH_SUBJECTS = ["Lógica e matemática discreta",
-                 ce"Probabilidade e estatística"]
+                 "Probabilidade e estatística"]
 COMPUTING_SUBJECTS = ["Algoritmos e estruturas de dados",
                       "Arquitetura de computadores e sistemas operacionais",
                       "Sistemas digitais",
