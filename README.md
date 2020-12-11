@@ -1,6 +1,6 @@
 # KDD-HigherEduBR
 
-https://travis-ci.com/renan-cunha/KDD-HigherEduBR.svg?token=HVUZn2CgFZmexfaxxwwt&branch=master
+[![Build Status](https://travis-ci.com/renan-cunha/KDD-HigherEduBR.svg?token=HVUZn2CgFZmexfaxxwwt&branch=master)](https://travis-ci.com/renan-cunha/KDD-HigherEduBR)
 
 Data Mining in Brazilian Higher Education
 
