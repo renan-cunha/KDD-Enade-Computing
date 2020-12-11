@@ -11,7 +11,7 @@ requirements: verify_environment
 
 raw_data: requirements
 	mkdir -p data/raw_data/enade_data
-	$(PYTHON_INTERPRETER) src/data/download_raw_data.py --path data/raw_data/enade_data
+	$(PYTHON_INTERPRETER) src/data/get_raw_data.py --path data/raw_data/enade_data
 
 verify_environment:
 	$(PYTHON_INTERPRETER) src/verify_environment.py
