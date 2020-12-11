@@ -58,10 +58,10 @@ get_processed_subject_df_data = [(1, True), (2, False)]
 
 @pytest.mark.parametrize("id, key", get_processed_subject_df_data)
 def test_get_processed_subject_df(id: int, key: bool) -> None:
-    df = get_processed_subject_df(os.path.join(DIR_PATH, "test",
+    df = get_processed_subject_df(os.path.join(DIR_PATH, "tests",
                                           f"input_processed_subject_df_{id}.csv"), key)
 
-    expected_df = pd.read_csv(os.path.join(DIR_PATH, "test",
+    expected_df = pd.read_csv(os.path.join(DIR_PATH, "tests",
                                            f"output_processed_subject_df_{id}.csv"),
                               dtype={
                                        "ano": int})
@@ -75,5 +75,5 @@ def test_get_processed_subject_df(id: int, key: bool) -> None:
 def test_get_processed_subject_df_error() -> None:
 
     with pytest.raises(ValueError):
-        df = get_processed_subject_df(os.path.join(DIR_PATH, "test",
+        df = get_processed_subject_df(os.path.join(DIR_PATH, "tests",
                                                    f"input_processed_subject_df_raise.csv"))
