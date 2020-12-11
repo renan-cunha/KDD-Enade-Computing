@@ -1,5 +1,7 @@
 # KDD-HigherEduBR
 
+https://travis-ci.com/renan-cunha/KDD-HigherEduBR.svg?token=HVUZn2CgFZmexfaxxwwt&branch=master
+
 Data Mining in Brazilian Higher Education
 
 ### Prerequisities

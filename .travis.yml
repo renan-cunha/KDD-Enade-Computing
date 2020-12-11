@@ -4,7 +4,10 @@ python:
 # command to install dependencies
 install:
   - pip install -r requirements.txt
+  - pip install pytest-cov codecov
 # command to run tests
 script:
   - make
-  - pytest
+  - pytest --cov=src tests
+after_success:
+  - codecov
