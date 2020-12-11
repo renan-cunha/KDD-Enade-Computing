@@ -10,4 +10,4 @@ script:
   - make
   - pytest --cov=src tests
 after_success:
-  - codecov
+  - codecov -t 376fbdd4-aa15-48a7-b0ad-add2ee3eaba4
