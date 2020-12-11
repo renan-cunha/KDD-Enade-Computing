@@ -14,7 +14,7 @@ raw_data: requirements
 	$(PYTHON_INTERPRETER) src/data/download_raw_data.py --path data/raw_data/enade_data
 
 verify_environment:
-	$(PYTHON_INTERPRETER) verify_environment.py
+	$(PYTHON_INTERPRETER) src/verify_environment.py
 
 clean:
 	rm -rf data/raw_data/enade_data

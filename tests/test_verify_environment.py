@@ -1,6 +1,6 @@
 import pytest
-from unittest.mock import MagicMock, Mock
-from verify_environment import verify_environment
+from unittest.mock import Mock
+from src.verify_environment import verify_environment
 
 
 def test_correct_environment():
