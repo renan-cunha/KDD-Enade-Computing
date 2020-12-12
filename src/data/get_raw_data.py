@@ -7,9 +7,11 @@ from src.config import years
 from typing import Callable
 from tqdm import tqdm
 import click
-from zipfile import ZipFile
+import zipfile
 import errno
 
+
+DATA_DIR_NAMES = ["2.DADOS", "3.DADOS"]
 
 class GetData:
 
@@ -60,12 +62,41 @@ class GetData:
             self.urls[0] = "microdados_enade_2017.zip"
             self.download_data(download_function)
 
+    def __extract_and_rename(self, zip: zipfile.ZipFile, file_path: str,
+                             new_path: str) -> None:
+        with open(new_path, "wb") as new_file:
+            with zip.open(file_path) as zip_file:
+                content = zip_file.read()
+                new_file.write(content)
+
+    def __get_data_file_name(self, year: int) -> str:
+        return f"{self.file_start_path}_{year}.csv"
+
+    def __get_zip_file_member(self, zip_file: zipfile.ZipFile) -> str:
+        """Returns the path of the data file inside the zip file"""
+        file_names = zip_file.namelist()
+        for file_name in file_names:
+            for data_dir_name in DATA_DIR_NAMES:
+                ends_with_txt = file_name.endswith(".txt")
+                ends_with_csv = file_name.endswith(".csv")
+                starts_with_dir_name = file_name.startswith(data_dir_name)
+                if starts_with_dir_name and (ends_with_csv or ends_with_txt):
+                    return file_name
+
+        raise ValueError(f"No member was found in the zipfile that starts with"
+                         f" {DATA_DIR_NAMES}")
+
     def extract_data(self) -> None:
         for year in tqdm(self.years):
-            file_path = self.__get_zip_file_path(year)
-            with ZipFile(file_path, 'r') as zip_file:
-                dirname = os.path.dirname(file_path)
-                zip_file.extractall(dirname)
+            zip_file_path = self.__get_zip_file_path(year)
+            with zipfile.ZipFile(zip_file_path, 'r') as zip_file:
+                dirname = os.path.dirname(zip_file_path)
+                member_name = self.__get_zip_file_member(zip_file)
+                file_name = f"{self.file_start_path}_{year}.csv"
+                file_path = os.path.join(dirname, file_name)
+                self.__extract_and_rename(zip_file,
+                                          member_name,
+                                          file_path)
 
 
 def main(path, download_function: Callable = urlretrieve) -> None:

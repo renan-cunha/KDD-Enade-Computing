@@ -2,7 +2,7 @@ from unittest.mock import Mock
 import pytest
 from src.data.get_raw_data import GetData, main
 import os
-from zipfile import ZipFile
+import zipfile
 
 years = [2017, 2014, 2011, 2008, 2005]
 
@@ -14,12 +14,13 @@ def setUp(tmpdir):
     yield download_data
 
 
-def assert_created_zip_files(tmpdir: str, extension: str) -> None:
+def assert_created_zip_files(tmpdir: str, extension: str,
+                             content: str = "") -> None:
     for year in years:
         file_path = os.path.join(tmpdir, f"enade_{year}",
                                  f"microdados_enade_{year}.{extension}")
         with open(file_path) as file:
-            assert file.read() == ''
+            assert file.read() == content
 
 
 class TestDownloadData:
@@ -53,6 +54,9 @@ class TestDownloadData:
         assert_created_zip_files(tmpdir, "zip")
 
 
+DATA_DIR_NAME = "2.DADOS"
+
+
 class TestExtractData:
 
     def create_zip_files(self, path) -> None:
@@ -64,9 +68,13 @@ class TestExtractData:
                                    f"{file_name}.zip") for file_name,
                                                   dir_name in zip(file_names,
                                                                   dir_names)]
-        for file_path, file_name in zip(file_paths, file_names):
-            with ZipFile(file_path, 'w') as myzip:
-                myzip.writestr(f'{file_name}.txt', '')
+        for file_path, year in zip(file_paths, years):
+            with zipfile.ZipFile(file_path, 'w') as myzip:
+
+                myzip.writestr(f"1.LEIA-me/manual.txt", '')
+                myzip.writestr(f"2.DADOS/", '')
+                myzip.writestr(f"2.DADOS/microdados_enade_{year}.txt", 'z')
+                myzip.writestr(f"INPUTS/scrip.sh", "")
 
     def test_extract_data(self, tmpdir: str, setUp) -> None:
         """Should create text files from zip files"""
@@ -76,7 +84,7 @@ class TestExtractData:
 
         #test
         get_data.extract_data()
-        assert_created_zip_files(tmpdir, "txt")
+        assert_created_zip_files(tmpdir, "csv", 'z')
 
 
 class TestMainData:
@@ -84,11 +92,13 @@ class TestMainData:
     def test_main_data(self, tmpdir):
 
         def t_write_a_file(url: str, file_path: str) -> None:
-            with ZipFile(file_path, "w") as zip_file:
+            with zipfile.ZipFile(file_path, "w") as zip_file:
                 file_name = os.path.basename(file_path)
-                new_file_name = file_name[:file_name.index(".zip")] + ".txt"
-                zip_file.writestr(new_file_name, "")
+                new_file_name = file_name[:file_name.index(".zip")] + ".csv"
+                new_file_path = os.path.join(DATA_DIR_NAME, new_file_name)
+                zip_file.writestr(f"2.DADOS/", '')
+                zip_file.writestr(new_file_path, "z")
 
         mock = Mock(side_effect=t_write_a_file)
         main(tmpdir, mock)
-        assert_created_zip_files(tmpdir, "txt")
+        assert_created_zip_files(tmpdir, "csv", 'z')
