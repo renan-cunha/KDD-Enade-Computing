@@ -9,7 +9,7 @@ years = [2017, 2014, 2011, 2008, 2005]
 
 @pytest.fixture()
 def setUp(tmpdir):
-    download_data = GetData(tmpdir)
+    download_data = GetData(tmpdir, tmpdir)
     download_data.write_directories()
     yield download_data
 
@@ -86,6 +86,38 @@ class TestExtractData:
         get_data.extract_data()
         assert_created_zip_files(tmpdir, "csv", 'z')
 
+    def test_manuals(self, tmpdir: str, setUp) -> None:
+        """Should create manual files from zip files"""
+        # setup
+        get_data = setUp
+
+        for year in years:
+            file_path = os.path.join(tmpdir, f'enade_{year}',
+                                     f"microdados_enade_{year}.zip")
+            with zipfile.ZipFile(file_path, 'w') as myzip:
+                if year % 2 == 0:
+                    myzip.writestr(f"1.LEIA-ME/manual.txt", 'leia')
+                else:
+                    myzip.writestr(f"1.DOCUMENTAÇ╟O/manual.txt", 'manual')
+                myzip.writestr(f"2.DADOS/dados.csv", "")
+        # run
+        get_data.extract_data()
+
+        # assert
+
+        with open(os.path.join(tmpdir, "enade_2017", "1.DOCUMENTAÇ╟O/manual.txt")) as file:
+            assert file.read() == "manual"
+        with open(os.path.join(tmpdir, "enade_2014", "1.LEIA-ME/manual.txt")) as file:
+            assert file.read() == "leia"
+        with open(os.path.join(tmpdir, "enade_2011", "1.DOCUMENTAÇ╟O/manual.txt")) as file:
+            assert file.read() == "manual"
+        with open(os.path.join(tmpdir, "enade_2008", "1.LEIA-ME/manual.txt")) as file:
+            assert file.read() == "leia"
+        with open(os.path.join(tmpdir, "enade_2005", "1.DOCUMENTAÇ╟O/manual.txt")) as file:
+            assert file.read() == "manual"
+
+
+
 
 class TestMainData:
 
@@ -100,5 +132,5 @@ class TestMainData:
                 zip_file.writestr(new_file_path, "z")
 
         mock = Mock(side_effect=t_write_a_file)
-        main(tmpdir, mock)
+        main(tmpdir,tmpdir,  True, True, mock)
         assert_created_zip_files(tmpdir, "csv", 'z')

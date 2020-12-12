@@ -9,13 +9,16 @@ from tqdm import tqdm
 import click
 import zipfile
 import errno
+import subprocess
 
 
 DATA_DIR_NAMES = ["2.DADOS", "3.DADOS"]
+README_DIR_NAMES = ['1.DOCUMENTAÇ╟O', "1.LEIA-ME"]
+
 
 class GetData:
 
-    def __init__(self, raw_data_path: str) -> None:
+    def __init__(self, raw_data_path: str, manuals_path: str = "") -> None:
         self.start_url = "http://download.inep.gov.br/microdados/Enade_Microdados/"
 
         end_url_2017 = "microdados_Enade_2017_portal_2018.10.09.zip"
@@ -27,6 +30,7 @@ class GetData:
         self.urls = [end_url_2017, end_url_2014, end_url_2011, end_url_2008,
                      end_url_2005]
         self.raw_data_path = raw_data_path
+        self.manuals_path = manuals_path
         self.file_start_path = "microdados_enade"
         self.years = years
 
@@ -90,30 +94,51 @@ class GetData:
         for year in tqdm(self.years):
             zip_file_path = self.__get_zip_file_path(year)
             with zipfile.ZipFile(zip_file_path, 'r') as zip_file:
-                dirname = os.path.dirname(zip_file_path)
-                member_name = self.__get_zip_file_member(zip_file)
-                file_name = f"{self.file_start_path}_{year}.csv"
-                file_path = os.path.join(dirname, file_name)
-                self.__extract_and_rename(zip_file,
-                                          member_name,
-                                          file_path)
+                self.__extract_csv(year, zip_file, zip_file_path)
+                self.__extract_manual(year, zip_file)
+
+    def __extract_csv(self, year: int, zip_file: zipfile.ZipFile,
+                      zip_file_path: str) -> None:
+            dirname = os.path.dirname(zip_file_path)
+            member_name = self.__get_zip_file_member(zip_file)
+            file_name = f"{self.file_start_path}_{year}.csv"
+            file_path = os.path.join(dirname, file_name)
+            self.__extract_and_rename(zip_file,
+                                      member_name,
+                                      file_path)
+
+    def __extract_manual(self, year: int,
+                        zip_file: zipfile.ZipFile) -> None:
+        dir = os.path.join(self.manuals_path, f"enade_{year}")
+        for file in zip_file.namelist():
+            for readme_dir_name in README_DIR_NAMES:
+                if file.startswith(readme_dir_name):
+                    zip_file.extract(file, dir)
 
 
-def main(path, download_function: Callable = urlretrieve) -> None:
-    get_data = GetData(path)
+def main(data_path: str, manuals_path: str, download: bool, extract: bool,
+         download_function: Callable = urlretrieve) -> None:
+    get_data = GetData(data_path, manuals_path)
     get_data.write_directories()
-    print("Downloading Data...")
-    get_data.download_data(download_function=download_function)
-    print("Download Complete")
-    print("Extracting data")
-    get_data.extract_data()
-    print("Extraction completed")
+    if download:
+        print("Downloading Data...")
+        get_data.download_data(download_function=download_function)
+        print("Download Complete")
+    if extract:
+        print("Extracting data")
+        get_data.extract_data()
+        print("Extraction completed")
 
 
 @click.command()
-@click.option('--path', help='Path to save downloaded files;')
-def click_main(path):
-    main(path)
+@click.option('--data_path', help='Path to save downloaded files;')
+@click.option('--manuals_path', default="", help='Path to save downloaded files;')
+@click.option('--download/--no-download', default=False,
+              help='Download data;')
+@click.option('--extract/--no-extract', default=False,
+              help='Extract data;')
+def click_main(data_path, manuals_path, download, extract):
+    main(data_path, manuals_path, download, extract)
 
 
 if "__main__" == __name__:
