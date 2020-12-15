@@ -1,8 +1,18 @@
 language: python
-python:
-  - "3.6"
+jobs:
+  include:
+    - name: "linux"
+      python: 3.6
+    - name: "windows"
+      os: windows
+      language: shell
+      before_install:
+        - choco install python --version 3.6.9
+        - python -m pip install --upgrade pip
+      env: PATH=/c/Python36:/c/Python36/Scripts:$PATH
 # command to install dependencies
 install:
+  - pip install --upgrade pip
   - pip install -r requirements.txt
   - pip install pytest-cov codecov
 # command to run tests
