@@ -2,33 +2,18 @@ import sys
 import os
 parent = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')) #this should give you absolute location of my_project folder.
 sys.path.append(parent)
-import requests
+from urllib.request import urlretrieve
 from src.config import years
-from typing import Callable, Tuple
+from typing import Callable
 from tqdm import tqdm
 import click
 import zipfile
 import errno
-from multiprocessing.pool import ThreadPool
-import psutil
+import subprocess
 
 
 DATA_DIR_NAMES = ["2.DADOS", "3.DADOS"]
 README_DIR_NAMES = ['1.DOCUMENTAÇ╟O', "1.LEIA-ME"]
-
-
-def download_url(data: Tuple[str, str]) -> str:
-    url, file_name = data
-    print("downloading: ", url)
-    # assumes that the last segment after the / represents the file name
-    # if url is abc/xyz/file.txt, the file name will be file.txt
-
-    r = requests.get(url, stream=True)
-    if r.status_code == requests.codes.ok:
-        with open(file_name, 'wb') as f:
-            for data in r:
-                f.write(data)
-    return url
 
 
 class GetData:
@@ -69,26 +54,12 @@ class GetData:
                     if exc.errno != errno.EEXIST:
                         raise OSError
 
-    def download_data(self, download_function: Callable = download_url) -> None:
+    def download_data(self, download_function: Callable = urlretrieve) -> None:
         try:
-            file_paths = []
-            local_urls = []
-            for url_year, year in zip(self.urls, self.years):
+            for url_year, year in zip(tqdm(self.urls), self.years):
                 url = f"{self.start_url}{url_year}"
                 file_path = self.__get_zip_file_path(year)
-
-                local_urls.append(url)
-                file_paths.append(file_path)
-
-            data_to_thread = zip(local_urls, file_paths)
-            num_cpus = psutil.cpu_count(logical=False)
-            print(num_cpus)
-            results = ThreadPool(num_cpus).imap_unordered(download_function, data_to_thread)
-            pbar = tqdm(total=len(local_urls))
-            for r in results:
-                print(r)
-                pbar.update(1)
-            pbar.close()
+                download_function(url, file_path)
         except ConnectionResetError:
             # In case original source is not working, download from github backup
             self.start_url = "https://github.com/renan-cunha/EnadeData/raw/main/"
@@ -146,7 +117,7 @@ class GetData:
 
 
 def main(data_path: str, manuals_path: str, download: bool, extract: bool,
-         download_function: Callable = download_url) -> None:
+         download_function: Callable = urlretrieve) -> None:
     get_data = GetData(data_path, manuals_path)
     get_data.write_directories()
     if download:
