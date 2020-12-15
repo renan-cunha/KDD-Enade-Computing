@@ -1,15 +1,15 @@
 language: python
 jobs:
   include:
-    - name: "linux"
-      python: 3.6
     - name: "windows"
       os: windows
       language: shell
       before_install:
-        - choco install python --version 3.6.9
+        - choco install python --version 3.6.8
         - python -m pip install --upgrade pip
       env: PATH=/c/Python36:/c/Python36/Scripts:$PATH
+    - name: "linux"
+      python: 3.6
 # command to install dependencies
 install:
   - pip install --upgrade pip
