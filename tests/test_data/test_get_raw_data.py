@@ -3,6 +3,7 @@ import pytest
 from src.data.get_raw_data import GetData, main
 import os
 import zipfile
+from typing import Tuple
 
 years = [2017, 2014, 2011, 2008, 2005]
 
@@ -27,7 +28,8 @@ class TestDownloadData:
 
     def test_download_data(self, tmpdir: str, setUp: GetData) -> None:
 
-        def t_write_a_file(url: str, file_path: str) -> None:
+        def t_write_a_file(data: Tuple[str, str]) -> None:
+            url, file_path = data
             file = open(file_path, "w")
             file.close()
 
@@ -39,18 +41,22 @@ class TestDownloadData:
     def test_download_data_with_exception(self, tmpdir: str, setUp: GetData) -> None:
 
         # setup
-        def t_write_a_file_failed(url: str, file_path: str) -> None:
-
+        def t_write_a_file_failed(data: Tuple[str, str]) -> str:
+            url, file_path = data
             if url.startswith("http://download.inep.gov.br"):
                 raise ConnectionResetError
             file = open(file_path, "w")
             file.close()
+            return url
 
         get_data = setUp
         mock = Mock(side_effect=t_write_a_file_failed)
         # test
         get_data.download_data(mock)
-        mock.assert_any_call("https://github.com/renan-cunha/EnadeData/raw/main/microdados_enade_2005.zip", os.path.join(tmpdir, f"enade_2005", "microdados_enade_2005.zip"))
+        data = ("https://github.com/renan-cunha/EnadeData/raw/main/microdados_enade_2005.zip",
+                os.path.join(tmpdir, "enade_2005", "microdados_enade_2005.zip"))
+        print(mock.mock_calls)
+        mock.assert_any_call(data)
         assert_created_zip_files(tmpdir, "zip")
 
 
@@ -117,13 +123,12 @@ class TestExtractData:
             assert file.read() == "manual"
 
 
-
-
 class TestMainData:
 
     def test_main_data(self, tmpdir):
 
-        def t_write_a_file(url: str, file_path: str) -> None:
+        def t_write_a_file(data: Tuple[str, str]) -> None:
+            url, file_path = data
             with zipfile.ZipFile(file_path, "w") as zip_file:
                 file_name = os.path.basename(file_path)
                 new_file_name = file_name[:file_name.index(".zip")] + ".csv"
