@@ -10,7 +10,7 @@ import click
 import zipfile
 import errno
 from multiprocessing.pool import ThreadPool
-import multiprocessing
+import psutil
 
 
 DATA_DIR_NAMES = ["2.DADOS", "3.DADOS"]
@@ -81,8 +81,9 @@ class GetData:
                 file_paths.append(file_path)
 
             data_to_thread = zip(local_urls, file_paths)
-            num_threads = multiprocessing.cpu_count()
-            results = ThreadPool(num_threads).imap_unordered(download_function, data_to_thread)
+            num_cpus = psutil.cpu_count(logical=False)
+            print(num_cpus)
+            results = ThreadPool(num_cpus).imap_unordered(download_function, data_to_thread)
             pbar = tqdm(total=len(local_urls))
             for r in results:
                 print(r)
