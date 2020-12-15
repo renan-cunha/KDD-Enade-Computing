@@ -10,6 +10,7 @@ import click
 import zipfile
 import errno
 from multiprocessing.pool import ThreadPool
+import multiprocessing
 
 
 DATA_DIR_NAMES = ["2.DADOS", "3.DADOS"]
@@ -80,10 +81,13 @@ class GetData:
                 file_paths.append(file_path)
 
             data_to_thread = zip(local_urls, file_paths)
-            num_urls = len(local_urls)
-            results = ThreadPool(num_urls).imap_unordered(download_function, data_to_thread)
-            for r in tqdm(results):
+            num_threads = multiprocessing.cpu_count()
+            results = ThreadPool(num_threads).imap_unordered(download_function, data_to_thread)
+            pbar = tqdm(total=len(local_urls))
+            for r in results:
                 print(r)
+                pbar.update(1)
+            pbar.close()
         except ConnectionResetError:
             # In case original source is not working, download from github backup
             self.start_url = "https://github.com/renan-cunha/EnadeData/raw/main/"

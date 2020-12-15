@@ -137,5 +137,5 @@ class TestMainData:
                 zip_file.writestr(new_file_path, "z")
 
         mock = Mock(side_effect=t_write_a_file)
-        main(tmpdir,tmpdir,  True, True, mock)
+        main(tmpdir, tmpdir,  True, True, mock)
         assert_created_zip_files(tmpdir, "csv", 'z')
