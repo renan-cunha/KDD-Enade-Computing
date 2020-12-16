@@ -1,11 +1,29 @@
 import pandas as pd
 from typing import Tuple
 from src import config
+from src.data import get_raw_data
+import os
 
-
+SELECTED_DATA_DIR = os.path.join(get_raw_data.DATA_DIR, "selected_data")
 COMPUTER_SCIENCE_CODE_2017_2014_2011 = 4004
 COMPUTER_SCIENCE_CODE_2008 = 4001
 COMPUTER_CODE_2005 = 40
+
+
+def get_selected_enade_csv_file_path(year: int,
+                                     path: str = SELECTED_DATA_DIR) -> str:
+    return os.path.join(path, f"microdados_ciencia_computacao_{year}.csv")
+
+
+def filter_computer_science(df: pd.DataFrame, year: int) -> pd.DataFrame:
+    if year in [2017, 2014, 2011]:
+        return filter_computer_science_2017_2014_2011(df)
+    elif year == 2008:
+        return filter_computer_science_2008(df)
+    elif year == 2005:
+        return filter_computer_science_2005(df)
+    else:
+        raise ValueError(f"Use a year of {config.years}, not {year}")
 
 
 def filter_computer_science_2017_2014_2011(df: pd.DataFrame) -> pd.DataFrame:
@@ -92,3 +110,14 @@ def filter_computer_science_2005(df: pd.DataFrame) -> pd.DataFrame:
     starting_dot_index = computer_df["vt_ace_oce"].str.startswith(starting_dots)
     ending_dot_index = computer_df["vt_ace_oce"].str.endswith(ending_dots)
     return computer_df.loc[starting_dot_index & ending_dot_index]
+
+
+def main(raw_data_path: str = get_raw_data.RAW_ENADE_DATA_DIR,
+         selected_data_path: str = SELECTED_DATA_DIR):
+    get_data = get_raw_data.GetData(raw_data_path=raw_data_path)
+
+    for year in config.years:
+        df_year = get_data.read_csv(year)
+        df_computer_science_year = filter_computer_science(df_year, year)
+        file_path = get_selected_enade_csv_file_path(year, selected_data_path)
+        df_computer_science_year.to_csv(file_path, index=False)
