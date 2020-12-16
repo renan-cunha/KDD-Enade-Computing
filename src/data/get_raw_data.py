@@ -10,6 +10,7 @@ import click
 import zipfile
 import errno
 import pandas as pd
+import numpy as np
 
 
 DATA_DIR_NAMES = ["2.DADOS", "3.DADOS"]
@@ -123,13 +124,59 @@ class GetData:
                 if file.startswith(readme_dir_name):
                     zip_file.extract(file, dir)
 
-    def read_csv(self, year: int) -> pd.DataFrame:
+    def __read_csv_2017_2014_2011(self, year: int) -> pd.DataFrame:
         file_path = get_raw_enade_csv_file_path(year,
                                                 raw_enade_data_dir=self.raw_data_path)
-        return pd.read_csv(file_path,
-                           sep=";",
-                           decimal=",",
-                           encoding="latin")
+        return pd.read_csv(file_path, sep=";", decimal=",",
+                           dtype={"DS_VT_ESC_OFG": str,
+                                  "DS_VT_ESC_OCE": str,
+                                  "DS_VT_ACE_OCE": str,
+                                  "DS_VT_ACE_OFG": str,
+                                  "NT_OBJ_CE": str,
+                                  "CO_IES": str,
+                                  "CO_CURSO": str,
+                                  "CO_MUNIC_CURSO": str})
+
+    def __read_csv_2008(self) -> pd.DataFrame:
+        file_path = get_raw_enade_csv_file_path(2008,
+                                                raw_enade_data_dir=self.raw_data_path)
+        return pd.read_csv(file_path, sep=";", decimal=".",
+                           dtype={"vt_esc_ofg": str,
+                                  "vt_esc_oce": str,
+                                  "vt_ace_oce": str,
+                                  "vt_ace_ofg": str,
+                                  "nt_obj_ce": str,
+                                  "co_grupo": int,
+                                  "nt_fg_d2": float,
+                                  "nt_ce_d3": float,
+                                  "nt_ce_d6": float,
+                                  "nt_dis_ce": float})
+
+    def __read_csv_2005(self) -> pd.DataFrame:
+        file_path = get_raw_enade_csv_file_path(2005,
+                                                raw_enade_data_dir=self.raw_data_path)
+        dtype = {"vt_esc_ofg": str,
+                 "vt_esc_oce": str,
+                 "vt_ace_oce": str,
+                 "vt_ace_ofg": str,
+                 "nt_obj_ce": str,
+                 "nt_dis_ce": str}
+        for i in range(1, 16):
+            dtype[f"nt_ce_d{i}"] = float
+        return pd.read_csv(file_path, sep=";", decimal=".",
+                           dtype=dtype,
+                           encoding='latin')
+
+    def read_csv(self, year: int) -> pd.DataFrame:
+        if year in [2017, 2014, 2011]:
+            return self.__read_csv_2017_2014_2011(year)
+        elif year == 2008:
+            return self.__read_csv_2008()
+        elif year == 2005:
+            return self.__read_csv_2005()
+        else:
+            raise ValueError(f"Year should be one of {config.years}, "
+                             f"not {year}")
 
 
 def main(data_path: str, manuals_path: str, download: bool, extract: bool,

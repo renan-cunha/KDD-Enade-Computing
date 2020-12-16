@@ -1,8 +1,13 @@
 import pandas as pd
 from typing import Tuple
-from src import config
-from src.data import get_raw_data
 import os
+import sys
+parent = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')) #this should give you absolute location of my_project folder.
+sys.path.append(parent)
+from src.data import get_raw_data
+from src import config
+from tqdm import tqdm
+import subprocess
 
 SELECTED_DATA_DIR = os.path.join(get_raw_data.DATA_DIR, "selected_data")
 COMPUTER_SCIENCE_CODE_2017_2014_2011 = 4004
@@ -114,10 +119,18 @@ def filter_computer_science_2005(df: pd.DataFrame) -> pd.DataFrame:
 
 def main(raw_data_path: str = get_raw_data.RAW_ENADE_DATA_DIR,
          selected_data_path: str = SELECTED_DATA_DIR):
+    subprocess.run(["mkdir", "-p", selected_data_path])
     get_data = get_raw_data.GetData(raw_data_path=raw_data_path)
 
-    for year in config.years:
+    for year in tqdm(config.years):
         df_year = get_data.read_csv(year)
         df_computer_science_year = filter_computer_science(df_year, year)
         file_path = get_selected_enade_csv_file_path(year, selected_data_path)
         df_computer_science_year.to_csv(file_path, index=False)
+
+
+
+if __name__ == "__main__":
+    print("Selecting Computer Science data")
+    main()
+    print("Selection completed")

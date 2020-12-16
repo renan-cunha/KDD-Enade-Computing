@@ -5,6 +5,7 @@ import os
 import zipfile
 import pandas as pd
 import subprocess
+from typing import Callable
 
 years = [2017, 2014, 2011, 2008, 2005]
 
@@ -140,21 +141,61 @@ class TestMainData:
 
 class TestReadCsv:
 
-    def test_read_csv(self, tmpdir) -> None:
+    def get_df_2017(self) -> pd.DataFrame:
+        return pd.DataFrame({"DS_VT_ESC_OFG": ["efe", "1"],
+                                  "DS_VT_ESC_OCE": ["r3r", "1"],
+                                  "DS_VT_ACE_OCE": ["r3", "1"],
+                                  "DS_VT_ACE_OFG": ["efe", "1"],
+                                  "NT_OBJ_CE": ["ege", "1"],
+                                  "CO_IES": ["1", "3frg"]})
 
-        csv_file_name = "microdados_enade_2005.csv"
-        dir_name = os.path.join(tmpdir, f"enade_{2005}")
+    def get_df_2008(self) -> pd.DataFrame:
+        return pd.DataFrame({"vt_esc_ofg": ["ef", '1'],
+                                "vt_esc_oce": ['1', '133'],
+                                "vt_ace_oce": ['erg', '2'],
+                                "vt_ace_ofg": ['r3r3', '2'],
+                                "nt_obj_ce": ['13', '13'],
+                                "co_grupo": [1, 2]})
+
+    def get_df_2005(self) -> pd.DataFrame:
+        return pd.DataFrame({"vt_esc_ofg": ['13', '1'],
+                                  "vt_esc_oce": ['12', '1243'],
+                                  "vt_ace_oce": ['124', '134'],
+                                  "vt_ace_ofg": ['1243', 'ete'],
+                                  "nt_obj_ce": ['143', '15425']})
+
+    def set_up(self, tmpdir: str, year: int, function: Callable) -> pd.DataFrame:
+        csv_file_name = f"microdados_enade_{year}.csv"
+        dir_name = os.path.join(tmpdir, f"enade_{year}")
         subprocess.run(["mkdir", dir_name])
         csv_file_path = os.path.join(dir_name, csv_file_name)
+        input_df = function()
+        input_df.to_csv(csv_file_path, sep=";", index=False)
+        return input_df
 
-        with open(csv_file_path, "w") as file:
-            file.write("column1;column2\n"
-                       "data1;10,2")
-
-        expected_df = pd.DataFrame(columns=["column1", "column2"],
-                                   data=[["data1", 10.2]])
+    def test_read_csv_2017(self, tmpdir) -> None:
+        year = 2017
+        input_df = self.set_up(tmpdir, year, self.get_df_2017)
 
         data = GetData(tmpdir)
-        output_df = data.read_csv(2005)
+        output_df = data.read_csv(year)
 
-        assert output_df.equals(expected_df)
+        assert output_df.equals(input_df)
+
+    def test_read_csv_2008(self, tmpdir) -> None:
+        year = 2008
+        input_df = self.set_up(tmpdir, year, self.get_df_2008)
+
+        data = GetData(tmpdir)
+        output_df = data.read_csv(year)
+
+        assert output_df.equals(input_df)
+
+    def test_read_csv_2005(self, tmpdir) -> None:
+        year = 2005
+        input_df = self.set_up(tmpdir, year, self.get_df_2005)
+
+        data = GetData(tmpdir)
+        output_df = data.read_csv(year)
+
+        assert output_df.equals(input_df)

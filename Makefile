@@ -1,4 +1,4 @@
-.PHONY: download_data requirements extract_data all
+.PHONY: download_data requirements extract_data select_data all
 
 PYTHON_INTERPRETER = python3
 #################################################################################
@@ -18,12 +18,16 @@ download_data: requirements
 extract_data:
 	$(PYTHON_INTERPRETER) src/data/get_raw_data.py --data_path data/raw_data/enade_data --manuals_path references/ --extract
 
+## Select Computer Science data from CSVs
+select_data:
+	$(PYTHON_INTERPRETER) src/selection/select_data.py
+
 ## Verify if the right python version is being used
 verify_environment:
 	$(PYTHON_INTERPRETER) src/verify_environment.py
 
 ## Run all necessary comamnds
-all: verify_environment requirements download_data extract_data
+all: verify_environment requirements download_data extract_data select_data
 	echo "Done"
 
 ## remove data files
