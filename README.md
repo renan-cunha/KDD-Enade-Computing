@@ -7,22 +7,26 @@ Data Mining in Brazilian Higher Education
 
 ### Prerequisities
 
-* Python 3.6.9+
+* Python 3.6
 * Linux
+* Make
 
-Install required packages by:
+#### Set up Environment
 
-```bash
-pip install -r requirements.txt
+* Setup a virtual environment using python 3.6, use 
+  [virtualenv](https://docs.python-guide.org/dev/virtualenvs/#lower-level-virtualenv) 
+  or [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html)
+
+#### Run
+
+```
+make all
 ```
 
-### Usage
+#### Documentation
 
-#### Get the data
-
-```bash
-cd data/
-bash get_data.sh
+```
+make
 ```
 
 #### View/Run the analysis
@@ -34,7 +38,7 @@ jupyter notebook main.ipynb
 #### Running the Tests
 
 ```bash
-pytest-3 tests/
+pytest tests/
 ```
 
 ## License
