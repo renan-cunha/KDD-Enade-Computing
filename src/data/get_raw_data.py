@@ -9,6 +9,7 @@ from tqdm import tqdm
 import click
 import zipfile
 import errno
+import pandas as pd
 
 
 DATA_DIR_NAMES = ["2.DADOS", "3.DADOS"]
@@ -121,6 +122,14 @@ class GetData:
             for readme_dir_name in README_DIR_NAMES:
                 if file.startswith(readme_dir_name):
                     zip_file.extract(file, dir)
+
+    def read_csv(self, year: int) -> pd.DataFrame:
+        file_path = get_raw_enade_csv_file_path(year,
+                                                raw_enade_data_dir=self.raw_data_path)
+        return pd.read_csv(file_path,
+                           sep=";",
+                           decimal=",",
+                           encoding="latin")
 
 
 def main(data_path: str, manuals_path: str, download: bool, extract: bool,

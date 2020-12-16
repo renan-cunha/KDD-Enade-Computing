@@ -3,6 +3,8 @@ import pytest
 from src.data.get_raw_data import GetData, main
 import os
 import zipfile
+import pandas as pd
+import subprocess
 
 years = [2017, 2014, 2011, 2008, 2005]
 
@@ -134,3 +136,25 @@ class TestMainData:
         mock = Mock(side_effect=t_write_a_file)
         main(tmpdir,tmpdir,  True, True, mock)
         assert_created_zip_files(tmpdir, "csv", 'z')
+
+
+class TestReadCsv:
+
+    def test_read_csv(self, tmpdir) -> None:
+
+        csv_file_name = "microdados_enade_2005.csv"
+        dir_name = os.path.join(tmpdir, f"enade_{2005}")
+        subprocess.run(["mkdir", dir_name])
+        csv_file_path = os.path.join(dir_name, csv_file_name)
+
+        with open(csv_file_path, "w") as file:
+            file.write("column1;column2\n"
+                       "data1;10,2")
+
+        expected_df = pd.DataFrame(columns=["column1", "column2"],
+                                   data=[["data1", 10.2]])
+
+        data = GetData(tmpdir)
+        output_df = data.read_csv(2005)
+
+        assert output_df.equals(expected_df)
