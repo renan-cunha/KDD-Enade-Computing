@@ -9,16 +9,26 @@ from tqdm import tqdm
 import click
 import zipfile
 import errno
-import subprocess
 
 
 DATA_DIR_NAMES = ["2.DADOS", "3.DADOS"]
 README_DIR_NAMES = ['1.DOCUMENTAÇ╟O', "1.LEIA-ME"]
+DATA_DIR = os.path.join("data")
+RAW_DATA_DIR = os.path.join(DATA_DIR, "raw_data")
+RAW_ENADE_DATA_DIR = os.path.join(RAW_DATA_DIR, "enade_data")
+MANUALS_DIR = os.path.join("references")
+
+
+def get_raw_enade_csv_file_path(year: int,
+                                raw_enade_data_dir: str = RAW_ENADE_DATA_DIR) -> str:
+    return os.path.join(raw_enade_data_dir, f"enade_{year}",
+                        f"microdados_enade_{year}.csv")
 
 
 class GetData:
 
-    def __init__(self, raw_data_path: str, manuals_path: str = "") -> None:
+    def __init__(self, raw_data_path: str = RAW_ENADE_DATA_DIR,
+                 manuals_path: str = MANUALS_DIR) -> None:
         self.start_url = "http://download.inep.gov.br/microdados/Enade_Microdados/"
 
         end_url_2017 = "microdados_Enade_2017_portal_2018.10.09.zip"
@@ -94,15 +104,12 @@ class GetData:
         for year in tqdm(self.years):
             zip_file_path = self.__get_zip_file_path(year)
             with zipfile.ZipFile(zip_file_path, 'r') as zip_file:
-                self.__extract_csv(year, zip_file, zip_file_path)
+                self.__extract_csv(year, zip_file)
                 self.__extract_manual(year, zip_file)
 
-    def __extract_csv(self, year: int, zip_file: zipfile.ZipFile,
-                      zip_file_path: str) -> None:
-            dirname = os.path.dirname(zip_file_path)
+    def __extract_csv(self, year: int, zip_file: zipfile.ZipFile) -> None:
             member_name = self.__get_zip_file_member(zip_file)
-            file_name = f"{self.file_start_path}_{year}.csv"
-            file_path = os.path.join(dirname, file_name)
+            file_path = get_raw_enade_csv_file_path(year, self.raw_data_path)
             self.__extract_and_rename(zip_file,
                                       member_name,
                                       file_path)
