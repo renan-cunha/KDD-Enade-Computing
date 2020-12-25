@@ -1,6 +1,6 @@
 from unittest.mock import Mock
 import pytest
-from src.data.get_raw_data import GetData, main
+from src.get_data.get_raw_data import GetData, main
 import os
 import zipfile
 import pandas as pd

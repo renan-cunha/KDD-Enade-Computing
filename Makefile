@@ -16,11 +16,11 @@ requirements: verify_environment
 ## Download data
 download_data: requirements
 	mkdir -p data/raw_data/enade_data
-	$(PYTHON_INTERPRETER) src/data/get_raw_data.py --data_path data/raw_data/enade_data --download
+	$(PYTHON_INTERPRETER) src/get_data/get_raw_data.py --data_path data/raw_data/enade_data --download
 
 ## Extract data from zip to csv
 extract_data:
-	$(PYTHON_INTERPRETER) src/data/get_raw_data.py --data_path data/raw_data/enade_data --manuals_path references/ --extract
+	$(PYTHON_INTERPRETER) src/get_data/get_raw_data.py --data_path data/raw_data/enade_data --manuals_path references/ --extract
 
 ## Select Computer Science data from CSVs
 select_data:

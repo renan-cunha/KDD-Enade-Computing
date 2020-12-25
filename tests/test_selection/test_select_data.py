@@ -149,7 +149,7 @@ class TestMain:
 
     def test_example(self, tmpdir, mocker) -> None:
 
-        mocker.patch("src.data.get_raw_data.GetData.read_csv",
+        mocker.patch("src.get_data.get_raw_data.GetData.read_csv",
                      side_effect=self.read_csv)
         mocker.patch("src.selection.select_data.filter_computer_science",
                      side_effect=self.filter_computer_science)

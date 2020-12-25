@@ -4,7 +4,7 @@ import os
 import sys
 parent = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')) #this should give you absolute location of my_project folder.
 sys.path.append(parent)
-from src.data import get_raw_data
+from src.get_data import get_raw_data
 from src import config
 from tqdm import tqdm
 import subprocess

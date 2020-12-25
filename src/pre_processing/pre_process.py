@@ -8,8 +8,8 @@ parent = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')) #this
 sys.path.append(parent)
 from src import config
 from src.selection import select_data
-from src.data.get_raw_data import DATA_DIR
-
+from src.get_data.get_raw_data import DATA_DIR
+from tqdm import tqdm
 
 PROCESSED_DATA_DIR = os.path.join(DATA_DIR, "processed_data")
 
@@ -42,7 +42,7 @@ def main(select_path: str = select_data.SELECTED_DATA_DIR,
          processed_path: str = PROCESSED_DATA_DIR):
 
     subprocess.run(["mkdir", "-p", processed_path])
-    for year in config.YEARS:
+    for year in tqdm(config.YEARS):
         df_year = select_data.read_csv(year, select_path)
         if year in [2008, 2005]:
             df_year = rename_columns_2008_2005(df_year)
@@ -52,6 +52,8 @@ def main(select_path: str = select_data.SELECTED_DATA_DIR,
 
 
 if __name__ == "__main__":
+    print("Pre-processing Data")
     main()
+    print("Pre-processing completed")
 
 
