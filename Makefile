@@ -1,9 +1,13 @@
-.PHONY: download_data requirements extract_data select_data all
+.PHONY: download_data requirements extract_data select_data pre_process_data all
 
 PYTHON_INTERPRETER = python3
 #################################################################################
 # COMMANDS                                                                      #
 #################################################################################
+
+## Verify if the right python version is being used
+verify_environment:
+	$(PYTHON_INTERPRETER) src/verify_environment.py
 
 ## Check the python requirements
 requirements: verify_environment
@@ -22,12 +26,12 @@ extract_data:
 select_data:
 	$(PYTHON_INTERPRETER) src/selection/select_data.py
 
-## Verify if the right python version is being used
-verify_environment:
-	$(PYTHON_INTERPRETER) src/verify_environment.py
+## Pre-process data from Computer Science CSVs
+pre_process_data:
+	$(PYTHON_INTERPRETER) src/pre_processing/pre_process.py
 
 ## Run all necessary comamnds
-all: verify_environment requirements download_data extract_data select_data
+all: verify_environment requirements download_data extract_data select_data pre_process_data
 	echo "Done"
 
 ## remove data files
