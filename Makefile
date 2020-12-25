@@ -37,6 +37,8 @@ all: verify_environment requirements download_data extract_data select_data pre_
 ## remove data files
 clean:
 	rm -rf data/raw_data/enade_data
+	rm -rf data/selected_data
+	rm -rf data/processed_data
 
 
 
