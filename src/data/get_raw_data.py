@@ -3,7 +3,7 @@ import os
 parent = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')) #this should give you absolute location of my_project folder.
 sys.path.append(parent)
 from urllib.request import urlretrieve
-from src.config import years
+from src.config import YEARS
 from typing import Callable
 from tqdm import tqdm
 import click
@@ -44,7 +44,7 @@ class GetData:
         self.raw_data_path = raw_data_path
         self.manuals_path = manuals_path
         self.file_start_path = "microdados_enade"
-        self.years = years
+        self.years = YEARS
 
     def __get_zip_file_name(self, year: int) -> str:
         return f"{self.file_start_path}_{year}.zip"
@@ -175,7 +175,7 @@ class GetData:
         elif year == 2005:
             return self.__read_csv_2005()
         else:
-            raise ValueError(f"Year should be one of {config.years}, "
+            raise ValueError(f"Year should be one of {config.YEARS}, "
                              f"not {year}")
 
 

@@ -1,7 +1,7 @@
 import os
 
 
-years = [2017, 2014, 2011, 2008, 2005]
+YEARS = [2017, 2014, 2011, 2008, 2005]
 CODE_COURSE_NEW = 4004
 CODE_COURSE_OLD = 4001
 DIFFICULTIES = ["muito facil", "facil", "medio", "dificil", "muito dificil"]
