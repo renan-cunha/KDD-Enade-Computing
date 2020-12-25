@@ -72,10 +72,7 @@ class Transform(ABC):
 
             test_type is "general" or "specific"
         """
-        test_type_options = ['general', 'specific']
-        if test_type not in test_type_options:
-            raise ValueError(f"test_type param should be one of "
-                             f"{test_type_options}, not {test_type}")
+        Transform.__verify_test_type(test_type)
 
         discursive_questions = self.questions_series.xs("discursive",
                                                         level="format")
@@ -93,7 +90,14 @@ class Transform(ABC):
         df[new_columns_labels] = df[score_labels]
         return df
 
-    def get_objective_scores(self, df: pd.DataFrame, general: bool) -> pd.DataFrame:
+    @staticmethod
+    def __verify_test_type(test_type: str) -> None:
+        test_type_options = ['general', 'specific']
+        if test_type not in test_type_options:
+            raise ValueError(f"test_type param should be one of "
+                             f"{test_type_options}, not {test_type}")
+
+    def get_objective_scores(self, df: pd.DataFrame, mode: bool) -> pd.DataFrame:
         """Creates columns for the objective part of the exam. Each column 'QUESTAO_{id}_NOTA'
         can have the values 0 (wrong alternative), 100 (correct).
         Columns such as 'QUESTAO_{id}_STATUS' can have values such as OK and RASURA"""
