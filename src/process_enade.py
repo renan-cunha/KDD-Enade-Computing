@@ -8,7 +8,7 @@ from src.config import NUM_ENADE_EXAM_QUESTIONS, PRESENCE_COLUMN, \
     SENIOR_STUDENT_CODE, CODE_COURSE_NEW, CODE_COURSE_OLD
 import os
 
-
+"""
 def filter_enade_df_by_ufpa_course(df: pd.DataFrame) -> pd.DataFrame:
     return df.loc[df["CO_CURSO"] == CODE_UFPA_COURSE]
 
@@ -20,21 +20,21 @@ def filter_enade_df_by_course_new(df: pd.DataFrame) -> pd.DataFrame:
 def filter_enade_df_by_course_old(df: pd.DataFrame) -> pd.DataFrame:
     return df.loc[df["CO_SUBAREA"] == CODE_COURSE_OLD]
 
-
-def filter_senior_students(df: pd.DataFrame) -> pd.DataFrame:
-    return df.loc[df["IN_GRAD"] == SENIOR_STUDENT_CODE]
-
-
 def get_recent_enade_dir(year: int) -> str:
-    """Used for enade 2017, 2014 and 2011"""
+    "Used for enade 2017, 2014 and 2011"
     return os.path.join(ENADE_DATA_DIR, f"enade{year}", "3.DADOS",
                         f"MICRODADOS_ENADE_{year}.txt")
 
 
 def get_old_enade_dir(year: int) -> str:
-    """Used for enade 2005 and 2008"""
+    "Used for enade 2005 and 2008"
     return os.path.join(ENADE_DATA_DIR, f"enade{year}", "2.DADOS",
                         f"microdados_enade_{year}.csv")
+"""
+
+
+def filter_senior_students(df: pd.DataFrame) -> pd.DataFrame:
+    return df.loc[df["IN_GRAD"] == SENIOR_STUDENT_CODE]
 
 
 def pre_process_old(df: pd.DataFrame) -> pd.DataFrame:
@@ -80,7 +80,7 @@ class ProcessEnade(ABC):
 
     def get_discursive_scores(self, df: pd.DataFrame, general: bool) -> pd.DataFrame:
         """Creates columns for the discursive part of the test. Columns such as
-            'QUESTAO_{id}_NOTA' for the score and 'QUESTAO_{id}_STATUS' that states
+            'QUESTAO_{id}_NOTA' for the score and 'QUESTAO_{id}_STATUS' that says
             if the question was cancelled"""
         test_label = "FG" if general else "CE"
         questions_id = self.GEN_DIS_QUESTIONS_ID if general else self.SPE_DIS_QUESTIONS_ID
@@ -141,13 +141,6 @@ class ProcessEnade(ABC):
     def filter_enade_df_by_course(self, df: pd.DataFrame) -> pd.DataFrame:
         pass
 
-    def filter_anomalies(self, df: pd.DataFrame) -> pd.DataFrame:
-        """This function filters the students that were present but have
-        missing values"""
-        arg1 = df["DS_VT_ESC_OCE"].isna()
-        arg2 = df["TP_PRES"] == 555
-        boolean_index = ~(arg1 & arg2)
-        return df.loc[boolean_index]
 
     def get_data(self, filter_by_ufpa: bool = True) -> pd.DataFrame:
 
