@@ -15,7 +15,7 @@ requirements: verify_environment
 
 ## Download data
 download_data: requirements
-	mkdir -p data/raw_data/enade_data
+	@mkdir -p data/raw_data/enade_data
 	$(PYTHON_INTERPRETER) src/get_data/get_raw_data.py --data_path data/raw_data/enade_data --download
 
 ## Extract data from zip to csv
@@ -32,7 +32,7 @@ pre_process_data:
 
 ## Run all necessary comamnds
 all: verify_environment requirements download_data extract_data select_data pre_process_data
-	echo "Done"
+	@echo "Done"
 
 ## remove data files
 clean:
