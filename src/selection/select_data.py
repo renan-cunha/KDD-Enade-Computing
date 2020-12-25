@@ -2,6 +2,9 @@ import pandas as pd
 from typing import Tuple
 import os
 import sys
+
+import src.config
+
 parent = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')) #this should give you absolute location of my_project folder.
 sys.path.append(parent)
 from src.get_data import get_raw_data
@@ -10,7 +13,7 @@ from tqdm import tqdm
 import subprocess
 
 
-SELECTED_DATA_DIR = os.path.join(get_raw_data.DATA_DIR, "selected_data")
+SELECTED_DATA_DIR = os.path.join(src.config.DATA_DIR, "selected_data")
 COMPUTER_SCIENCE_CODE_2017_2014_2011 = 4004
 COMPUTER_SCIENCE_CODE_2008 = 4001
 COMPUTER_CODE_2005 = 40

@@ -8,7 +8,7 @@ parent = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')) #this
 sys.path.append(parent)
 from src import config
 from src.selection import select_data
-from src.get_data.get_raw_data import DATA_DIR
+from src.config import DATA_DIR
 from tqdm import tqdm
 
 PROCESSED_DATA_DIR = os.path.join(DATA_DIR, "processed_data")

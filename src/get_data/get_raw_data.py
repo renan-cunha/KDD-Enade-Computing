@@ -3,19 +3,16 @@ import os
 parent = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')) #this should give you absolute location of my_project folder.
 sys.path.append(parent)
 from urllib.request import urlretrieve
-from src.config import YEARS
+from src.config import YEARS, DATA_DIR
 from typing import Callable
 from tqdm import tqdm
 import click
 import zipfile
 import errno
 import pandas as pd
-import numpy as np
-
 
 DATA_DIR_NAMES = ["2.DADOS", "3.DADOS"]
 README_DIR_NAMES = ['1.DOCUMENTAÇ╟O', "1.LEIA-ME"]
-DATA_DIR = os.path.join("data")
 RAW_DATA_DIR = os.path.join(DATA_DIR, "raw_data")
 RAW_ENADE_DATA_DIR = os.path.join(RAW_DATA_DIR, "enade_data")
 MANUALS_DIR = os.path.join("references")
