@@ -52,8 +52,4 @@ def main(select_path: str = select_data.SELECTED_DATA_DIR,
 
 
 if __name__ == "__main__":
-    print("Pre-processing Data")
     main()
-    print("Pre-processing completed")
-
-

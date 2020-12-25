@@ -138,6 +138,4 @@ def main(raw_data_path: str = get_raw_data.RAW_ENADE_DATA_DIR,
 
 
 if __name__ == "__main__":
-    print("Selecting Computer Science data")
     main()
-    print("Selection completed")

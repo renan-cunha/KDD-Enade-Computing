@@ -24,11 +24,15 @@ extract_data:
 
 ## Select Computer Science data from CSVs
 select_data:
+	@echo "Selecting Computer Science data"
 	$(PYTHON_INTERPRETER) src/selection/select_data.py
+	@echo "Selection completed"
 
 ## Pre-process data from Computer Science CSVs
 pre_process_data:
+	@echo "Pre-processing data"
 	$(PYTHON_INTERPRETER) src/pre_processing/pre_process.py
+	@echo "Pre-processing completed"
 
 ## Run all necessary comamnds
 all: verify_environment requirements download_data extract_data select_data pre_process_data
