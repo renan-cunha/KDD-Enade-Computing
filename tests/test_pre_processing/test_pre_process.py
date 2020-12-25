@@ -46,6 +46,7 @@ class TestGetFilePath:
         assert expected == output
 
 
+
 class TestMain:
 
     def side_effect(self, input: pd.DataFrame) -> pd.DataFrame:

@@ -3,17 +3,17 @@ from typing import Tuple
 import os
 import sys
 
-import src.config
 
 parent = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')) #this should give you absolute location of my_project folder.
 sys.path.append(parent)
+from src import config
 from src.get_data import get_raw_data
 from src import config
 from tqdm import tqdm
 import subprocess
 
 
-SELECTED_DATA_DIR = os.path.join(src.config.DATA_DIR, "selected_data")
+SELECTED_DATA_DIR = os.path.join(config.DATA_DIR, "selected_data")
 COMPUTER_SCIENCE_CODE_2017_2014_2011 = 4004
 COMPUTER_SCIENCE_CODE_2008 = 4001
 COMPUTER_CODE_2005 = 40
@@ -32,11 +32,21 @@ def filter_computer_science(df: pd.DataFrame, year: int) -> pd.DataFrame:
     if year in [2017, 2014, 2011]:
         return filter_computer_science_2017_2014_2011(df)
     elif year == 2008:
-        return filter_computer_science_2008(df)
+        return filter_2008(df)
     elif year == 2005:
-        return filter_computer_science_2005(df)
+        return filter_2005(df)
     else:
         raise ValueError(f"Use a year of {config.YEARS}, not {year}")
+
+
+def filter_2008(df: pd.DataFrame) -> pd.DataFrame:
+    df_senior = filter_senior_students(df)
+    return filter_computer_science_2008(df_senior)
+
+
+def filter_2005(df: pd.DataFrame) -> pd.DataFrame:
+    df_senior = filter_senior_students(df)
+    return filter_computer_science_2005(df_senior)
 
 
 def filter_computer_science_2017_2014_2011(df: pd.DataFrame) -> pd.DataFrame:
@@ -123,6 +133,10 @@ def filter_computer_science_2005(df: pd.DataFrame) -> pd.DataFrame:
     starting_dot_index = computer_df["vt_ace_oce"].str.startswith(starting_dots)
     ending_dot_index = computer_df["vt_ace_oce"].str.endswith(ending_dots)
     return computer_df.loc[starting_dot_index & ending_dot_index]
+
+
+def filter_senior_students(df: pd.DataFrame) -> pd.DataFrame:
+    return df.loc[df["in_grad"] == 0]
 
 
 def main(raw_data_path: str = get_raw_data.RAW_ENADE_DATA_DIR,

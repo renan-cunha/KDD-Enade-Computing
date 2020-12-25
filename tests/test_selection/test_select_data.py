@@ -100,39 +100,84 @@ class TestGetSelectedEnadeCsvFilePath:
 
 class TestFilterComputerScience:
 
-    def return_dataframe(self) -> pd.DataFrame:
-        return pd.DataFrame({"column1": [1], "column2": [2]})
+    def return_input_dataframe(self) -> pd.DataFrame:
+        return pd.DataFrame({"in_grad": [0, 1], "column2": [2, 3]})
+
+    def return_output_dataframe(self) -> pd.DataFrame:
+        return pd.DataFrame({"in_grad": [0], "column2": [2]})
 
     def test_2017(self, mocker: MockerFixture) -> None:
         year = 2017
         mocker.patch("src.selection.select_data.filter_computer_science_2017_2014_2011",
-                     side = self.return_dataframe)
+                     side = self.return_input_dataframe)
 
-        input_df = self.return_dataframe()
+        input_df = self.return_input_dataframe()
         output_df = select_data.filter_computer_science(input_df, year)
 
         assert output_df.equals(input_df)
-
 
     def test_2008(self, mocker: MockerFixture) -> None:
         year = 2008
-        mocker.patch("src.selection.select_data.filter_computer_science_2008",
-                     side = self.return_dataframe)
+        mocker.patch("src.selection.select_data.filter_2008",
+                     side = self.return_output_dataframe)
 
-        input_df = self.return_dataframe()
+        input_df = self.return_output_dataframe()
         output_df = select_data.filter_computer_science(input_df, year)
 
         assert output_df.equals(input_df)
+        select_data.filter_2008.called_once()
 
     def test_2005(self, mocker: MockerFixture) -> None:
         year = 2005
-        mocker.patch("src.selection.select_data.filter_computer_science_2005",
-                     side = self.return_dataframe)
+        mocker.patch("src.selection.select_data.filter_2005",
+                     side = self.return_output_dataframe)
 
-        input_df = self.return_dataframe()
+        input_df = self.return_output_dataframe()
         output_df = select_data.filter_computer_science(input_df, year)
 
         assert output_df.equals(input_df)
+        select_data.filter_2005.called_once()
+
+
+class TestFilterSeniorStudents:
+
+    def test_filter_senior_students(self) -> None:
+        input_df = pd.DataFrame({"in_grad": [0, 1]})
+        expected_df = pd.DataFrame({"in_grad": [0]})
+
+        output_df = select_data.filter_senior_students(input_df)
+        assert output_df.equals(expected_df)
+
+
+class TestFilterEnade2008:
+
+    def test_filter_2008(self) -> None:
+        input_df = pd.DataFrame({"in_grad": [0, 1, 0, 1],
+                                 "co_subarea": [4001, 4001, 4000, 4000]})
+        expected_df = pd.DataFrame({"in_grad": [0], "co_subarea": [4001]})
+
+        output_df = select_data.filter_2008(input_df)
+        assert output_df.equals(expected_df)
+
+
+class TestFilterEnade2005:
+
+    def side_effect(self, df: pd.DataFrame) -> pd.DataFrame:
+        return df
+
+    def test_filter_2005(self, mocker: MockerFixture) -> None:
+
+        input_df = pd.DataFrame({"in_grad": [0, 1],
+                                 "co_subarea": [4001, 4001]})
+        expected_df = pd.DataFrame({"in_grad": [0], "co_subarea": [4001]})
+        mocker.patch("src.selection.select_data.filter_computer_science_2005",
+                     side_effect=self.side_effect)
+
+        output_df = select_data.filter_2008(input_df)
+        assert output_df.equals(expected_df)
+
+        output_df = select_data.filter_2008(input_df)
+        assert output_df.equals(expected_df)
 
 
 class TestMain:
