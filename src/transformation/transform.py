@@ -66,32 +66,37 @@ class Transform(ABC):
         raise NotImplementedError
 
     def transform_discursive_scores(self, df: pd.DataFrame,
-                                    general: bool) -> pd.DataFrame:
+                                    test_type: str) -> pd.DataFrame:
         """Creates columns 'QUESTAO_{id}_nota' for scores in the discursive
-        part of the test."""
-        type_test_question = "general" if general else "specific"
+        part of the test.
+
+            test_type is "general" or "specific"
+        """
+        test_type_options = ['general', 'specific']
+        if test_type not in test_type_options:
+            raise ValueError(f"test_type param should be one of "
+                             f"{test_type_options}, not {test_type}")
 
         discursive_questions = self.questions_series.xs("discursive",
                                                         level="format")
         discursive_questions_type_test = discursive_questions.xs(
-            type_test_question, level="test_type")
+            test_type, level="test_type")
 
         questions_ids = discursive_questions_type_test["id"]
         questions_labels = discursive_questions_type_test["label"]
 
-        test_label = Transform.type_test_label[type_test_question]
+        test_label = Transform.type_test_label[test_type]
 
         score_labels = [f"NT_{test_label}_D{x}" for x in questions_labels]
         new_columns_labels = [f"QUESTAO_{x}_NOTA" for x in questions_ids]
 
         df[new_columns_labels] = df[score_labels]
         return df
-    """
 
     def get_objective_scores(self, df: pd.DataFrame, general: bool) -> pd.DataFrame:
-        "Creates columns for the objective part of the exam. Each column 'QUESTAO_{id}_NOTA'
+        """Creates columns for the objective part of the exam. Each column 'QUESTAO_{id}_NOTA'
         can have the values 0 (wrong alternative), 100 (correct).
-        Columns such as 'QUESTAO_{id}_STATUS' can have values such as OK and RASURA"
+        Columns such as 'QUESTAO_{id}_STATUS' can have values such as OK and RASURA"""
 
         test_label = "FG" if general else "CE"
         questions_id = self.GEN_OBJ_QUESTIONS_ID if general else self.SPE_OBJ_QUESTIONS_ID
@@ -120,33 +125,3 @@ class Transform(ABC):
             df.loc[deletion_index, new_column_label] = DELETION_LABEL
 
         return df
-
-    @abstractmethod
-    def filter_enade_df_by_course(self, df: pd.DataFrame) -> pd.DataFrame:
-        pass
-
-    def filter_anomalies(self, df: pd.DataFrame) -> pd.DataFrame:
-        "This function filters the students that were present but have
-        missing values"
-        arg1 = df["DS_VT_ESC_OCE"].isna()
-        arg2 = df["TP_PRES"] == 555
-        boolean_index = ~(arg1 & arg2)
-        return df.loc[boolean_index]
-
-    def get_data(self, filter_by_ufpa: bool = True) -> pd.DataFrame:
-
-        df = self.read_csv()
-        df = self.pre_process(df)
-        if filter_by_ufpa:
-            df = filter_enade_df_by_ufpa_course(df)
-        else:
-            df = self.filter_enade_df_by_course(df)
-            df = self.filter_anomalies(df)
-
-        df = self.get_objective_scores(df, general=True)
-        df = self.preprocess_discursive_scores(df, general=True)
-        df = self.preprocess_discursive_scores(df, general=False)
-        df = self.get_objective_scores(df, general=False)
-
-        return self.filter_columns_enade(df)
-    """

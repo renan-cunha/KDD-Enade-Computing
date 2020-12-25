@@ -20,7 +20,7 @@ class TestTransformDiscursiveScore20142017:
         # execute
         transform2014_2017 = Transform2014_2017()
         output_df = transform2014_2017.transform_discursive_scores(input_df,
-                                                                   True)
+                                                                   "general")
 
         # assert
         assert output_df.equals(expected_df)
@@ -44,7 +44,7 @@ class TestTransformDiscursiveScore20142017:
         # execute
         transform2014_2017 = Transform2014_2017()
         output_df = transform2014_2017.transform_discursive_scores(input_df,
-                                                                   False)
+                                                                   "specific")
 
         # assert
         assert output_df.equals(expected_df)
