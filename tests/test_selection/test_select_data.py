@@ -155,8 +155,25 @@ class TestMain:
                      side_effect=self.filter_computer_science)
         select_data.main(tmpdir, tmpdir)
 
-        for year in config.years:
+        for year in config.YEARS:
             file_path = os.path.join(tmpdir,
                                      f"microdados_ciencia_computacao_{year}.csv")
             df = pd.read_csv(file_path)
             assert df.equals(self.expected_df)
+
+
+class TestReadCsv:
+
+    def test_read_csv(self, tmpdir) -> None:
+        year = 2005
+        # setup
+        file_path = os.path.join(tmpdir, f"microdados_ciencia_computacao_{year}.csv")
+        with open(file_path, "w") as f:
+            f.write("a,b\n1,2")
+        expected_df = pd.DataFrame({"a":[1], "b": [2]})
+
+        # execute
+        output_df = select_data.read_csv(year, tmpdir)
+
+        # assert
+        assert output_df.equals(expected_df)

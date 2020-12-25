@@ -9,10 +9,15 @@ from src import config
 from tqdm import tqdm
 import subprocess
 
+
 SELECTED_DATA_DIR = os.path.join(get_raw_data.DATA_DIR, "selected_data")
 COMPUTER_SCIENCE_CODE_2017_2014_2011 = 4004
 COMPUTER_SCIENCE_CODE_2008 = 4001
 COMPUTER_CODE_2005 = 40
+
+
+def read_csv(year: int, path: str = SELECTED_DATA_DIR) -> pd.DataFrame:
+    return pd.read_csv(get_selected_enade_csv_file_path(year, path))
 
 
 def get_selected_enade_csv_file_path(year: int,
@@ -28,7 +33,7 @@ def filter_computer_science(df: pd.DataFrame, year: int) -> pd.DataFrame:
     elif year == 2005:
         return filter_computer_science_2005(df)
     else:
-        raise ValueError(f"Use a year of {config.years}, not {year}")
+        raise ValueError(f"Use a year of {config.YEARS}, not {year}")
 
 
 def filter_computer_science_2017_2014_2011(df: pd.DataFrame) -> pd.DataFrame:
@@ -122,12 +127,11 @@ def main(raw_data_path: str = get_raw_data.RAW_ENADE_DATA_DIR,
     subprocess.run(["mkdir", "-p", selected_data_path])
     get_data = get_raw_data.GetData(raw_data_path=raw_data_path)
 
-    for year in tqdm(config.years):
+    for year in tqdm(config.YEARS):
         df_year = get_data.read_csv(year)
         df_computer_science_year = filter_computer_science(df_year, year)
         file_path = get_selected_enade_csv_file_path(year, selected_data_path)
         df_computer_science_year.to_csv(file_path, index=False)
-
 
 
 if __name__ == "__main__":
