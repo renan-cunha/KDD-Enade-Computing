@@ -3,6 +3,9 @@ import itertools
 import pandas as pd
 from typing import List, Tuple
 
+BLANK_OBJECTIVE_ANSWER_CODE = "."
+DELETED_OBJECTIVE_ANSWER_CODE = "*"
+
 
 class Transform(ABC):
 
@@ -112,7 +115,15 @@ class Transform(ABC):
         for id, question_label in zip(questions_ids, questions_labels):
             new_column_label = f"QUESTAO_{id}_NOTA"
             df[new_column_label] = df[f"DS_VT_ACE_O{test_label}"].str[question_label]
+            df[new_column_label] = df[new_column_label].replace([".", "*"], "0")
             df[new_column_label] = df[new_column_label].astype(float)
             df[new_column_label] *= 100
 
         return df
+
+    def transform_objective_situation(self, df: pd.DataFrame,
+                                      test_type: str) -> pd.DataFrame:
+        """Creates columns 'QUESTAO_{id}_situation' for objective questions, they
+        can have the values "ok", "branco" and "rasura"
+        test_type is "general" or "specific" """
+        raise NotImplementedError()

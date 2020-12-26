@@ -4,6 +4,7 @@ import pandas as pd
 from pytest_mock import MockerFixture
 from typing import List, Tuple
 
+
 class TestGetQuestionsIdsAndsLabels:
 
     @pytest.mark.parametrize("input,expected",
@@ -74,14 +75,16 @@ class TestTransformObjectiveScore20142017:
     def test_transform_objective_scores_2014_2017_general(self,
                                                           mocker: MockerFixture) -> None:
         # arrange
-        input_df = pd.DataFrame({"DS_VT_ACE_OFG": ["01"]})
-        expected_df = pd.DataFrame({"DS_VT_ACE_OFG": ["01"],
+        input_df = pd.DataFrame({"DS_VT_ACE_OFG": ["01.*"]})
+        expected_df = pd.DataFrame({"DS_VT_ACE_OFG": ["01.*"],
                                  "QUESTAO_1_NOTA": [0.0],
-                                 "QUESTAO_2_NOTA": [100.0]})
+                                 "QUESTAO_2_NOTA": [100.0],
+                                 "QUESTAO_3_NOTA": [0.0],
+                                 "QUESTAO_4_NOTA": [0.0]})
 
         def side_effect(test_type: str,
                         question_format:  str) -> Tuple[List[int], List[int]]:
-            return [1, 2], [0, 1]
+            return [1, 2, 3, 4], [0, 1, 2, 3]
 
         mocker.patch("src.transformation.transform.Transform.get_questions_ids_and_labels",
                      side_effect=side_effect)
@@ -95,6 +98,20 @@ class TestTransformObjectiveScore20142017:
         assert output_df.equals(expected_df)
         transform2014_2017.get_questions_ids_and_labels.assert_called_once_with("general", "objective")
 
+"""
+class TestTransformObjectiveSituation20142017:
 
+    def test_transform_objective_situation_2014_2017(self) -> None:
+        # arrange
+        input_df = pd.DataFrame({"DS_VT_ACE_OFG": ["01.*"]})
+        expected_df = pd.DataFrame({"DS_VT_ACE_OFG": ["01.*"],
+                                    "QUESTAO_1_NOTA": [],
+                                    "QUESTAO_2_NOTA": [100.0]})
 
+        def side_effect(test_type: str,
+                        question_format:  str) -> Tuple[List[int], List[int]]:
+            return [1, 2], [0, 1]
 
+        mocker.patch("src.transformation.transform.Transform.get_questions_ids_and_labels",
+                     side_effect=side_effect)
+"""
