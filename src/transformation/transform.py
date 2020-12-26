@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import itertools
 import pandas as pd
-from typing import List
+from typing import List, Tuple
 
 
 class Transform(ABC):
@@ -73,22 +73,24 @@ class Transform(ABC):
             test_type is "general" or "specific"
         """
         Transform.__verify_test_type(test_type)
-
-        discursive_questions = self.questions_series.xs("discursive",
-                                                        level="format")
-        discursive_questions_type_test = discursive_questions.xs(
-            test_type, level="test_type")
-
-        questions_ids = discursive_questions_type_test["id"]
-        questions_labels = discursive_questions_type_test["label"]
-
         test_label = Transform.type_test_label[test_type]
+        questions_ids, questions_labels = self.__get_questions_ids_and_labels(
+            test_type, "discursive")
 
         score_labels = [f"NT_{test_label}_D{x}" for x in questions_labels]
         new_columns_labels = [f"QUESTAO_{x}_NOTA" for x in questions_ids]
 
         df[new_columns_labels] = df[score_labels]
         return df
+
+    def __get_questions_ids_and_labels(self, test_type: str,
+                                       question_format: str) -> Tuple[List[int],
+                                                                      List[int]]:
+        questions = self.questions_series.xs(question_format, level="format")
+        questions_type_test = questions.xs(test_type, level="test_type")
+        questions_ids = questions_type_test["id"]
+        questions_labels = questions_type_test["label"]
+        return questions_ids, questions_labels
 
     @staticmethod
     def __verify_test_type(test_type: str) -> None:
@@ -97,35 +99,20 @@ class Transform(ABC):
             raise ValueError(f"test_type param should be one of "
                              f"{test_type_options}, not {test_type}")
 
-    def get_objective_scores(self, df: pd.DataFrame, mode: bool) -> pd.DataFrame:
+    def transform_objective_scores(self, df: pd.DataFrame, test_type: str) -> pd.DataFrame:
         """Creates columns for the objective part of the exam. Each column 'QUESTAO_{id}_NOTA'
         can have the values 0 (wrong alternative), 100 (correct).
         Columns such as 'QUESTAO_{id}_STATUS' can have values such as OK and RASURA"""
 
-        test_label = "FG" if general else "CE"
-        questions_id = self.GEN_OBJ_QUESTIONS_ID if general else self.SPE_OBJ_QUESTIONS_ID
-        questions_label = self.GEN_OBJ_QUESTIONS_LABEL if general else self.SPE_OBJ_QUESTIONS_LABEL
-        for id, question_label in zip(questions_id, questions_label):
+        Transform.__verify_test_type(test_type)
+        test_label = Transform.type_test_label[test_type]
+        questions_ids, questions_labels = self.__get_questions_ids_and_labels(
+            test_type, "objective")
 
+        for id, question_label in zip(questions_ids, questions_labels):
             new_column_label = f"QUESTAO_{id}_NOTA"
-            df.loc[:, new_column_label] = df.loc[:, f"DS_VT_ACE_O{test_label}"].str[question_label]
-            digit_index = df.loc[:, new_column_label] == "1"
-            if digit_index.any():
-                df.loc[digit_index, new_column_label] = df.loc[digit_index,
-                                                               new_column_label].astype(int)*100
-
-            first_code, second_code = CODE_CANCELLED_OBJ_QUESTION
-            arg1 = df.loc[:, f"DS_VT_ACE_O{test_label}"].str[question_label] == first_code
-            arg2 = df.loc[:, f"DS_VT_ACE_O{test_label}"].str[question_label] == second_code
-            cancelled_index = arg1 | arg2
-            df.loc[cancelled_index, f"QUESTAO_{id}_STATUS"] = CANCELLED_LABEL
-            df.loc[~cancelled_index, f"QUESTAO_{id}_STATUS"] = "OK"
-            df.loc[cancelled_index, new_column_label] = CANCELLED_LABEL
-
-            blank_index = df.loc[:, f"DS_VT_ESC_O{test_label}"].str[question_label] == "."
-            df.loc[blank_index, new_column_label] = BLANK_LABEL
-
-            deletion_index = df.loc[:, f"DS_VT_ESC_O{test_label}"].str[question_label] == "*"
-            df.loc[deletion_index, new_column_label] = DELETION_LABEL
+            df[new_column_label] = df.loc[f"DS_VT_ACE_O{test_label}"].str[question_label]
+            df[new_column_label] = df[new_column_label].astype(float)
+            df[new_column_label] *= 100
 
         return df
