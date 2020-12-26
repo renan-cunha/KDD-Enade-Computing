@@ -70,45 +70,20 @@ class TestTransformDiscursiveScore20142017:
         assert output_df.equals(expected_df)
 
 
-class TestTransformObjectiveScore20142017:
 
-    def test_transform_objective_scores_2014_2017_general(self,
-                                                          mocker: MockerFixture) -> None:
+class TestTransformObjectiveQuestions:
+
+    def test_transform_objective_questions(self, mocker: MockerFixture) -> None:
         # arrange
         input_df = pd.DataFrame({"DS_VT_ACE_OFG": ["01.*"]})
         expected_df = pd.DataFrame({"DS_VT_ACE_OFG": ["01.*"],
-                                 "QUESTAO_1_NOTA": [0.0],
-                                 "QUESTAO_2_NOTA": [100.0],
-                                 "QUESTAO_3_NOTA": [0.0],
-                                 "QUESTAO_4_NOTA": [0.0]})
-
-        def side_effect(test_type: str,
-                        question_format:  str) -> Tuple[List[int], List[int]]:
-            return [1, 2, 3, 4], [0, 1, 2, 3]
-
-        mocker.patch("src.transformation.transform.Transform.get_questions_ids_and_labels",
-                     side_effect=side_effect)
-
-        # execute
-        transform2014_2017 = Transform2014_2017()
-        output_df = transform2014_2017.transform_objective_scores(input_df,
-                                                                  "general")
-
-        # assert
-        assert output_df.equals(expected_df)
-        transform2014_2017.get_questions_ids_and_labels.assert_called_once_with("general", "objective")
-
-
-class TestTransformObjectiveSituation20142017:
-
-    def test_transform_objective_situation_2014_2017(self,
-                                                     mocker: MockerFixture) -> None:
-        # arrange
-        input_df = pd.DataFrame({"DS_VT_ACE_OFG": ["01.*"]})
-        expected_df = pd.DataFrame({"DS_VT_ACE_OFG": ["01.*"],
+                                    "QUESTAO_1_NOTA": [0.0],
                                     "QUESTAO_1_SITUACAO": ["ok"],
+                                    "QUESTAO_2_NOTA": [100.0],
                                     "QUESTAO_2_SITUACAO": ["ok"],
+                                    "QUESTAO_3_NOTA": [0.0],
                                     "QUESTAO_3_SITUACAO": ["branco"],
+                                    "QUESTAO_4_NOTA": [0.0],
                                     "QUESTAO_4_SITUACAO": ["rasura"],
                                     })
 
@@ -121,7 +96,7 @@ class TestTransformObjectiveSituation20142017:
 
         # execute
         transform2014_2017 = Transform2014_2017()
-        output_df = transform2014_2017.transform_objective_situation(input_df,
+        output_df = transform2014_2017.transform_objective_questions(input_df,
                                                                      "general")
 
         # assert

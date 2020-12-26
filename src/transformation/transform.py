@@ -102,10 +102,16 @@ class Transform(ABC):
             raise ValueError(f"test_type param should be one of "
                              f"{test_type_options}, not {test_type}")
 
-    def transform_objective_scores(self, df: pd.DataFrame, test_type: str) -> pd.DataFrame:
+    def transform_objective_questions(self, df:pd.DataFrame,
+                                     test_type: str) -> pd.DataFrame:
         """Creates columns 'QUESTAO_{id}_NOTA' for objective questions, they
         can have the values 0 (wrong alternative), 100 (correct).
-        test_type is "general" or "specific" """
+
+        Also Creates columns 'QUESTAO_{id}_SITUATION' for objective questions,
+        they can have the values "ok", "branco" and "rasura"
+
+        test_type param can be "general" or "specific"
+         """
 
         Transform.__verify_test_type(test_type)
         test_label = Transform.type_test_label[test_type]
@@ -113,30 +119,35 @@ class Transform(ABC):
             test_type, "objective")
 
         for id, question_label in zip(questions_ids, questions_labels):
-            new_column_label = f"QUESTAO_{id}_NOTA"
-            df[new_column_label] = df[f"DS_VT_ACE_O{test_label}"].str[question_label]
-            df[new_column_label] = df[new_column_label].replace([".", "*"], "0")
-            df[new_column_label] = df[new_column_label].astype(float)
-            df[new_column_label] *= 100
+            Transform.__add_column_score(df, id, question_label, test_label)
+            Transform.__add_column_situation(df, id, question_label, test_label)
 
         return df
 
-    def transform_objective_situation(self, df: pd.DataFrame,
-                                      test_type: str) -> pd.DataFrame:
-        """Creates columns 'QUESTAO_{id}_situation' for objective questions, they
-        can have the values "ok", "branco" and "rasura"
-        test_type is "general" or "specific" """
-        Transform.__verify_test_type(test_type)
-        test_label = Transform.type_test_label[test_type]
-        questions_ids, questions_labels = self.get_questions_ids_and_labels(
-            test_type, "objective")
+    @staticmethod
+    def __add_column_score(df: pd.DataFrame,
+                           id: int,
+                           question_label: int,
+                           test_label: str) -> pd.DataFrame:
+        new_column_label = f"QUESTAO_{id}_NOTA"
+        df[new_column_label] = df[f"DS_VT_ACE_O{test_label}"].str[
+            question_label]
+        df[new_column_label] = df[new_column_label].replace([".", "*"], "0")
+        df[new_column_label] = df[new_column_label].astype(float)
+        df[new_column_label] *= 100
+        return df
 
-        for id, question_label in zip(questions_ids, questions_labels):
-            new_column_label = f"QUESTAO_{id}_SITUACAO"
-            df[new_column_label] = df[f"DS_VT_ACE_O{test_label}"].str[question_label]
-            df[new_column_label] = df[new_column_label].replace({"1": "ok",
-                                                                 "0": "ok",
-                                                                 ".": "branco",
-                                                                 "*": "rasura"})
+    @staticmethod
+    def __add_column_situation(df: pd.DataFrame,
+                               id: int,
+                               question_label: int,
+                               test_label: str) -> pd.DataFrame:
+        new_column_label = f"QUESTAO_{id}_SITUACAO"
+        df[new_column_label] = df[f"DS_VT_ACE_O{test_label}"].str[
+            question_label]
+        df[new_column_label] = df[new_column_label].replace({"1": "ok",
+                                                             "0": "ok",
+                                                             ".": "branco",
+                                                             "*": "rasura"})
         return df
 
