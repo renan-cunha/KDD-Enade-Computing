@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 import itertools
 import pandas as pd
 from typing import List, Tuple
+import numpy as np
 
 BLANK_OBJECTIVE_ANSWER_CODE = "."
 DELETED_OBJECTIVE_ANSWER_CODE = "*"
@@ -73,7 +74,7 @@ class Transform(ABC):
         """Creates columns 'QUESTAO_{id}_nota' for scores in the discursive
         part of the test.
 
-            test_type is "general" or "specific"
+        test_type is "general" or "specific"
         """
         Transform.__verify_test_type(test_type)
         test_label = Transform.type_test_label[test_type]
@@ -134,6 +135,7 @@ class Transform(ABC):
             question_label]
         df[new_column_label] = df[new_column_label].replace([".", "*"], "0")
         df[new_column_label] = df[new_column_label].astype(float)
+        df[new_column_label] = df[new_column_label].replace([8, 9], np.nan)
         df[new_column_label] *= 100
         return df
 
@@ -147,6 +149,8 @@ class Transform(ABC):
             question_label]
         df[new_column_label] = df[new_column_label].replace({"1": "ok",
                                                              "0": "ok",
+                                                             "9": "anulada",
+                                                             "8": "anulada",
                                                              ".": "branco",
                                                              "*": "rasura"})
         return df

@@ -3,7 +3,7 @@ from src.transformation.transform_2014_2017 import Transform2014_2017
 import pandas as pd
 from pytest_mock import MockerFixture
 from typing import List, Tuple
-
+import numpy as np
 
 class TestGetQuestionsIdsAndsLabels:
 
@@ -75,8 +75,8 @@ class TestTransformObjectiveQuestions:
 
     def test_transform_objective_questions(self, mocker: MockerFixture) -> None:
         # arrange
-        input_df = pd.DataFrame({"DS_VT_ACE_OFG": ["01.*"]})
-        expected_df = pd.DataFrame({"DS_VT_ACE_OFG": ["01.*"],
+        input_df = pd.DataFrame({"DS_VT_ACE_OFG": ["01.*89"]})
+        expected_df = pd.DataFrame({"DS_VT_ACE_OFG": ["01.*89"],
                                     "QUESTAO_1_NOTA": [0.0],
                                     "QUESTAO_1_SITUACAO": ["ok"],
                                     "QUESTAO_2_NOTA": [100.0],
@@ -85,11 +85,15 @@ class TestTransformObjectiveQuestions:
                                     "QUESTAO_3_SITUACAO": ["branco"],
                                     "QUESTAO_4_NOTA": [0.0],
                                     "QUESTAO_4_SITUACAO": ["rasura"],
+                                    "QUESTAO_5_NOTA": [np.nan],
+                                    "QUESTAO_5_SITUACAO": ["anulada"],
+                                    "QUESTAO_6_NOTA": [np.nan],
+                                    "QUESTAO_6_SITUACAO": ["anulada"],
                                     })
 
         def side_effect(test_type: str,
                         question_format:  str) -> Tuple[List[int], List[int]]:
-            return [1, 2, 3, 4], [0, 1, 2, 3]
+            return [1, 2, 3, 4, 5, 6], [0, 1, 2, 3, 4, 5]
 
         mocker.patch("src.transformation.transform.Transform.get_questions_ids_and_labels",
                      side_effect=side_effect)
