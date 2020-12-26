@@ -1,11 +1,18 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 import itertools
 import pandas as pd
 from typing import List, Tuple
 import numpy as np
+from src import config
+
+BLANK_DISCURSIVE_ANSWER_CODE = 333
+CANCELLED_DISCURSIVE_ANSWER_CODE = 335
+VALID_DISCURSIVE_ANSWER_CODE = 555
 
 BLANK_OBJECTIVE_ANSWER_CODE = "."
 DELETED_OBJECTIVE_ANSWER_CODE = "*"
+CANCELLED_OBJECTIVE_ANSWER_CODE = ["8", "9"]
+VALID_OBJECTIVE_ANSWER_CODE = ["1", "0"]
 
 
 class Transform(ABC):
@@ -69,10 +76,13 @@ class Transform(ABC):
     def specific_objective_questions_labels(self) -> List[int]:
         raise NotImplementedError
 
-    def transform_discursive_scores(self, df: pd.DataFrame,
-                                    test_type: str) -> pd.DataFrame:
+    def transform_discursive_questions(self, df: pd.DataFrame,
+                                       test_type: str) -> pd.DataFrame:
         """Creates columns 'QUESTAO_{id}_nota' for scores in the discursive
         part of the test.
+
+        Also Creates columns 'QUESTAO_{id}_SITUATION' for discursive questions,
+        they can have the values "ok" and "branco"
 
         test_type is "general" or "specific"
         """
@@ -81,10 +91,24 @@ class Transform(ABC):
         questions_ids, questions_labels = self.get_questions_ids_and_labels(
             test_type, "discursive")
 
-        score_labels = [f"NT_{test_label}_D{x}" for x in questions_labels]
-        new_columns_labels = [f"QUESTAO_{x}_NOTA" for x in questions_ids]
+        # score columns
+        score_columns= [f"NT_{test_label}_D{x}" for x in questions_labels]
+        new_score_columns = [f"QUESTAO_{x}_NOTA" for x in questions_ids]
+        df[new_score_columns] = df[score_columns]
 
-        df[new_columns_labels] = df[score_labels]
+        # situation columns
+        situation_columns = [f"TP_S{test_label}_D{x}" for x in questions_labels]
+        new_situation_columns = [f"QUESTAO_{x}_SITUACAO" for x in questions_ids]
+        df[new_situation_columns] = df[situation_columns]
+        df[new_situation_columns] = df[situation_columns].replace({BLANK_DISCURSIVE_ANSWER_CODE: config.BLANK_ANSWER_LABEL,
+                                                                   CANCELLED_DISCURSIVE_ANSWER_CODE: np.nan,
+                                                                   VALID_DISCURSIVE_ANSWER_CODE: config.VAlID_ANSWER_LABEL})
+
+        for score_column, situation_column in zip(new_score_columns,
+                                                  new_situation_columns):
+            index = (df[situation_column].isna())
+            df.loc[index, score_column] = np.nan
+
         return df
 
     def get_questions_ids_and_labels(self, test_type: str,
@@ -133,9 +157,11 @@ class Transform(ABC):
         new_column_label = f"QUESTAO_{id}_NOTA"
         df[new_column_label] = df[f"DS_VT_ACE_O{test_label}"].str[
             question_label]
-        df[new_column_label] = df[new_column_label].replace([".", "*"], "0")
+        df[new_column_label] = df[new_column_label].replace([BLANK_OBJECTIVE_ANSWER_CODE,
+                                                             DELETED_OBJECTIVE_ANSWER_CODE], "0")
+        df[new_column_label] = df[new_column_label].replace(CANCELLED_OBJECTIVE_ANSWER_CODE,
+                                                            np.nan)
         df[new_column_label] = df[new_column_label].astype(float)
-        df[new_column_label] = df[new_column_label].replace([8, 9], np.nan)
         df[new_column_label] *= 100
         return df
 
@@ -147,11 +173,13 @@ class Transform(ABC):
         new_column_label = f"QUESTAO_{id}_SITUACAO"
         df[new_column_label] = df[f"DS_VT_ACE_O{test_label}"].str[
             question_label]
-        df[new_column_label] = df[new_column_label].replace({"1": "ok",
-                                                             "0": "ok",
-                                                             "9": "anulada",
-                                                             "8": "anulada",
-                                                             ".": "branco",
-                                                             "*": "rasura"})
+        df[new_column_label] = df[new_column_label].replace(VALID_OBJECTIVE_ANSWER_CODE,
+                                                            config.VAlID_ANSWER_LABEL)
+        df[new_column_label] = df[new_column_label].replace(DELETED_OBJECTIVE_ANSWER_CODE,
+                                                            config.DELETION_ANSWER_LABEL)
+        df[new_column_label] = df[new_column_label].replace(CANCELLED_OBJECTIVE_ANSWER_CODE,
+                                                            np.nan)
+        df[new_column_label] = df[new_column_label].replace(BLANK_OBJECTIVE_ANSWER_CODE,
+                                                            config.BLANK_ANSWER_LABEL)
         return df
 
