@@ -41,10 +41,10 @@ class TestTransformDiscursiveQuestions20142017:
                                     f"NT_{label}_D2": [0, 0],
                                     f"TP_S{label}_D1": [333, 555],
                                     f"TP_S{label}_D2": [335, 335],
-                                    "QUESTAO_1_NOTA": [0.0, 50.0],
-                                    "QUESTAO_2_NOTA": [np.nan, np.nan],
                                     "QUESTAO_1_SITUACAO": ["branco", "ok"],
-                                    "QUESTAO_2_SITUACAO": [np.nan, np.nan]}
+                                    "QUESTAO_1_NOTA": [0.0, 50.0],
+                                    "QUESTAO_2_SITUACAO": [np.nan, np.nan],
+                                    "QUESTAO_2_NOTA": [np.nan, np.nan]}
                                    )
 
         def side_effect(test_type: str,
@@ -56,8 +56,8 @@ class TestTransformDiscursiveQuestions20142017:
 
         # execute
         transform2014_2017 = Transform2014_2017()
-        output_df = transform2014_2017.transform_discursive_questions(input_df,
-                                                                      test_type)
+        output_df = transform2014_2017.transform_questions(input_df, test_type,
+                                                           "discursive")
 
         # assert
         assert output_df.equals(expected_df)
@@ -73,18 +73,18 @@ class TestTransformObjectiveQuestions:
         # arrange
         input_df = pd.DataFrame({f"DS_VT_ACE_O{label}": ["01.*89"]})
         expected_df = pd.DataFrame({f"DS_VT_ACE_O{label}": ["01.*89"],
-                                    "QUESTAO_1_NOTA": [0.0],
                                     "QUESTAO_1_SITUACAO": ["ok"],
-                                    "QUESTAO_2_NOTA": [100.0],
+                                    "QUESTAO_1_NOTA": [0.0],
                                     "QUESTAO_2_SITUACAO": ["ok"],
-                                    "QUESTAO_3_NOTA": [0.0],
+                                    "QUESTAO_2_NOTA": [100.0],
                                     "QUESTAO_3_SITUACAO": ["branco"],
-                                    "QUESTAO_4_NOTA": [0.0],
+                                    "QUESTAO_3_NOTA": [0.0],
                                     "QUESTAO_4_SITUACAO": ["rasura"],
-                                    "QUESTAO_5_NOTA": [np.nan],
+                                    "QUESTAO_4_NOTA": [0.0],
                                     "QUESTAO_5_SITUACAO": [np.nan],
-                                    "QUESTAO_6_NOTA": [np.nan],
+                                    "QUESTAO_5_NOTA": [np.nan],
                                     "QUESTAO_6_SITUACAO": [np.nan],
+                                    "QUESTAO_6_NOTA": [np.nan],
                                     })
 
         def side_effect(test_type: str,
@@ -96,8 +96,8 @@ class TestTransformObjectiveQuestions:
 
         # execute
         transform2014_2017 = Transform2014_2017()
-        output_df = transform2014_2017.transform_objective_questions(input_df,
-                                                                     test_type)
+        output_df = transform2014_2017.transform_questions(input_df,
+                                                           test_type, "objective")
 
         # assert
         assert output_df.equals(expected_df)
