@@ -5,6 +5,7 @@ from pytest_mock import MockerFixture
 from typing import List, Tuple
 import numpy as np
 
+
 class TestGetQuestionsIdsAndsLabels:
 
     @pytest.mark.parametrize("input,expected",
@@ -39,7 +40,7 @@ class TestTransformDiscursiveScore20142017:
 
         # execute
         transform2014_2017 = Transform2014_2017()
-        output_df = transform2014_2017.transform_discursive_scores(input_df,
+        output_df = transform2014_2017.transform_discursive_questions(input_df,
                                                                    "general")
 
         # assert
@@ -63,20 +64,23 @@ class TestTransformDiscursiveScore20142017:
 
         # execute
         transform2014_2017 = Transform2014_2017()
-        output_df = transform2014_2017.transform_discursive_scores(input_df,
+        output_df = transform2014_2017.transform_discursive_questions(input_df,
                                                                    "specific")
 
         # assert
         assert output_df.equals(expected_df)
 
 
-
 class TestTransformObjectiveQuestions:
 
-    def test_transform_objective_questions(self, mocker: MockerFixture) -> None:
+    @pytest.mark.parametrize("input", [("specific", "CE"),
+                                       ("general", "FG")])
+    def test_transform_objective_questions(self, input,
+                                           mocker: MockerFixture) -> None:
+        test_type, label = input
         # arrange
-        input_df = pd.DataFrame({"DS_VT_ACE_OFG": ["01.*89"]})
-        expected_df = pd.DataFrame({"DS_VT_ACE_OFG": ["01.*89"],
+        input_df = pd.DataFrame({f"DS_VT_ACE_O{label}": ["01.*89"]})
+        expected_df = pd.DataFrame({f"DS_VT_ACE_O{label}": ["01.*89"],
                                     "QUESTAO_1_NOTA": [0.0],
                                     "QUESTAO_1_SITUACAO": ["ok"],
                                     "QUESTAO_2_NOTA": [100.0],
@@ -86,9 +90,9 @@ class TestTransformObjectiveQuestions:
                                     "QUESTAO_4_NOTA": [0.0],
                                     "QUESTAO_4_SITUACAO": ["rasura"],
                                     "QUESTAO_5_NOTA": [np.nan],
-                                    "QUESTAO_5_SITUACAO": ["anulada"],
+                                    "QUESTAO_5_SITUACAO": [np.nan],
                                     "QUESTAO_6_NOTA": [np.nan],
-                                    "QUESTAO_6_SITUACAO": ["anulada"],
+                                    "QUESTAO_6_SITUACAO": [np.nan],
                                     })
 
         def side_effect(test_type: str,
@@ -101,7 +105,9 @@ class TestTransformObjectiveQuestions:
         # execute
         transform2014_2017 = Transform2014_2017()
         output_df = transform2014_2017.transform_objective_questions(input_df,
-                                                                     "general")
+                                                                     test_type)
 
         # assert
         assert output_df.equals(expected_df)
+        transform2014_2017.get_questions_ids_and_labels.assert_called_once_with(test_type,
+                                                                                "objective")
