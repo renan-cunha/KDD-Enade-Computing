@@ -74,7 +74,7 @@ class Transform(ABC):
         """
         Transform.__verify_test_type(test_type)
         test_label = Transform.type_test_label[test_type]
-        questions_ids, questions_labels = self.__get_questions_ids_and_labels(
+        questions_ids, questions_labels = self.get_questions_ids_and_labels(
             test_type, "discursive")
 
         score_labels = [f"NT_{test_label}_D{x}" for x in questions_labels]
@@ -83,8 +83,8 @@ class Transform(ABC):
         df[new_columns_labels] = df[score_labels]
         return df
 
-    def __get_questions_ids_and_labels(self, test_type: str,
-                                       question_format: str) -> Tuple[List[int],
+    def get_questions_ids_and_labels(self, test_type: str,
+                                     question_format: str) -> Tuple[List[int],
                                                                       List[int]]:
         questions = self.questions_series.xs(question_format, level="format")
         questions_type_test = questions.xs(test_type, level="test_type")
@@ -100,18 +100,18 @@ class Transform(ABC):
                              f"{test_type_options}, not {test_type}")
 
     def transform_objective_scores(self, df: pd.DataFrame, test_type: str) -> pd.DataFrame:
-        """Creates columns for the objective part of the exam. Each column 'QUESTAO_{id}_NOTA'
+        """Creates columns 'QUESTAO_{id}_NOTA' for objective questions, they
         can have the values 0 (wrong alternative), 100 (correct).
-        Columns such as 'QUESTAO_{id}_STATUS' can have values such as OK and RASURA"""
+        test_type is "general" or "specific" """
 
         Transform.__verify_test_type(test_type)
         test_label = Transform.type_test_label[test_type]
-        questions_ids, questions_labels = self.__get_questions_ids_and_labels(
+        questions_ids, questions_labels = self.get_questions_ids_and_labels(
             test_type, "objective")
 
         for id, question_label in zip(questions_ids, questions_labels):
             new_column_label = f"QUESTAO_{id}_NOTA"
-            df[new_column_label] = df.loc[f"DS_VT_ACE_O{test_label}"].str[question_label]
+            df[new_column_label] = df[f"DS_VT_ACE_O{test_label}"].str[question_label]
             df[new_column_label] = df[new_column_label].astype(float)
             df[new_column_label] *= 100
 

@@ -1,6 +1,8 @@
 import pytest
 from src.transformation.transform_2014_2017 import Transform2014_2017
 import pandas as pd
+from pytest_mock import MockerFixture
+from typing import List, Tuple
 
 
 class TestTransformDiscursiveScore20142017:
@@ -49,7 +51,31 @@ class TestTransformDiscursiveScore20142017:
         # assert
         assert output_df.equals(expected_df)
 
+class TestTransformObjectiveScore20142017:
 
+    def test_transform_objective_scores_2014_2017_general(self,
+                                                          mocker: MockerFixture) -> None:
+        # arrange
+        input_df = pd.DataFrame({"DS_VT_ACE_OFG": ["01"]})
+        expected_df = pd.DataFrame({"DS_VT_ACE_OFG": ["01"],
+                                 "QUESTAO_1_NOTA": [0.0],
+                                 "QUESTAO_2_NOTA": [100.0]})
+
+        def side_effect(test_type: str,
+                        question_format:  str) -> Tuple[List[int], List[int]]:
+            return [1, 2], [0, 1]
+
+        mocker.patch("src.transformation.transform.Transform.get_questions_ids_and_labels",
+                     side_effect=side_effect)
+
+        # execute
+        transform2014_2017 = Transform2014_2017()
+        output_df = transform2014_2017.transform_objective_scores(input_df,
+                                                                  "general")
+
+        # assert
+        assert output_df.equals(expected_df)
+        transform2014_2017.get_questions_ids_and_labels.assert_called_once_with("general", "objective")
 
 
 
