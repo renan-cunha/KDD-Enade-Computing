@@ -126,4 +126,17 @@ class Transform(ABC):
         """Creates columns 'QUESTAO_{id}_situation' for objective questions, they
         can have the values "ok", "branco" and "rasura"
         test_type is "general" or "specific" """
-        raise NotImplementedError()
+        Transform.__verify_test_type(test_type)
+        test_label = Transform.type_test_label[test_type]
+        questions_ids, questions_labels = self.get_questions_ids_and_labels(
+            test_type, "objective")
+
+        for id, question_label in zip(questions_ids, questions_labels):
+            new_column_label = f"QUESTAO_{id}_SITUACAO"
+            df[new_column_label] = df[f"DS_VT_ACE_O{test_label}"].str[question_label]
+            df[new_column_label] = df[new_column_label].replace({"1": "ok",
+                                                                 "0": "ok",
+                                                                 ".": "branco",
+                                                                 "*": "rasura"})
+        return df
+
