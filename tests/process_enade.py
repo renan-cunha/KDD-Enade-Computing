@@ -51,7 +51,7 @@ def test_discursive_scores(input: str, expected: str, key: bool, gen_ids: list,
     process_2017.GEN_DIS_QUESTIONS_ID = gen_ids
     process_2017.SPE_DIS_QUESTIONS_LABEL = spe_labels
     process_2017.SPE_DIS_QUESTIONS_ID = spe_ids
-    output_df = process_2017.preprocess_discursive_scores(input_df, key)
+    output_df = process_2017.transform_discursive_scores(input_df, key)
     expected_df = expected_df.astype(output_df.dtypes)
     assert output_df.equals(expected_df)
 

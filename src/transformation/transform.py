@@ -119,16 +119,16 @@ class Transform(ABC):
             test_type, "objective")
 
         for id, question_label in zip(questions_ids, questions_labels):
-            Transform.__add_column_score(df, id, question_label, test_label)
+            Transform.__add_column_score_objective_question(df, id, question_label, test_label)
             Transform.__add_column_situation(df, id, question_label, test_label)
 
         return df
 
     @staticmethod
-    def __add_column_score(df: pd.DataFrame,
-                           id: int,
-                           question_label: int,
-                           test_label: str) -> pd.DataFrame:
+    def __add_column_score_objective_question(df: pd.DataFrame,
+                                              id: int,
+                                              question_label: int,
+                                              test_label: str) -> pd.DataFrame:
         new_column_label = f"QUESTAO_{id}_NOTA"
         df[new_column_label] = df[f"DS_VT_ACE_O{test_label}"].str[
             question_label]
