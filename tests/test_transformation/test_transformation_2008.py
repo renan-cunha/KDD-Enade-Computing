@@ -4,6 +4,8 @@ import pandas as pd
 from pytest_mock import MockerFixture
 from typing import List, Tuple
 import numpy as np
+import subprocess
+import os
 
 
 class TestGetQuestionsIdsAndsLabels:
@@ -103,6 +105,7 @@ class TestTransformObjectiveQuestions:
         assert output_df.equals(expected_df)
         transform.get_questions_ids_and_labels.assert_called_once_with(test_type,
                                                                                 "objective")
+
 class TestTransformationTransform:
 
     def test_transformation_transform(self, mocker: MockerFixture) -> None:
@@ -131,4 +134,9 @@ class TestTransformationTransform:
         output_df = transform.transform(input_df)
 
         # assert
-        assert output_df.equals(output_df)
+        assert output_df.equals(expected_df)
+
+
+
+
+

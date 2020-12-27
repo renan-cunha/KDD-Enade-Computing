@@ -131,4 +131,4 @@ class TestTransformationTransform:
         output_df = transform.transform(input_df)
 
         # assert
-        assert output_df.equals(output_df)
+        assert output_df.equals(expected_df)
