@@ -51,7 +51,7 @@ class TestTransformDiscursiveQuestions2011:
                         question_format:  str) -> Tuple[List[int], List[int]]:
             return [1, 2], [1, 2]
 
-        mocker.patch("src.transformation.transform.Transform.get_questions_ids_and_labels",
+        mocker.patch("src.transformation.transform_abstract.Transform.get_questions_ids_and_labels",
                      side_effect=side_effect)
 
         # execute
@@ -91,7 +91,7 @@ class TestTransformObjectiveQuestions:
                         question_format:  str) -> Tuple[List[int], List[int]]:
             return [1, 2, 3, 4, 5, 6], [0, 1, 2, 3, 4, 5]
 
-        mocker.patch("src.transformation.transform.Transform.get_questions_ids_and_labels",
+        mocker.patch("src.transformation.transform_abstract.Transform.get_questions_ids_and_labels",
                      side_effect=side_effect)
 
         # execute

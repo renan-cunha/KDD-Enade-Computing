@@ -51,7 +51,7 @@ class TestTransformDiscursiveQuestions20142017:
                         question_format:  str) -> Tuple[List[int], List[int]]:
             return [1, 2], [1, 2]
 
-        mocker.patch("src.transformation.transform.Transform.get_questions_ids_and_labels",
+        mocker.patch("src.transformation.transform_abstract.Transform.get_questions_ids_and_labels",
                      side_effect=side_effect)
 
         # execute
@@ -91,7 +91,7 @@ class TestTransformObjectiveQuestions:
                         question_format:  str) -> Tuple[List[int], List[int]]:
             return [1, 2, 3, 4, 5, 6], [0, 1, 2, 3, 4, 5]
 
-        mocker.patch("src.transformation.transform.Transform.get_questions_ids_and_labels",
+        mocker.patch("src.transformation.transform_abstract.Transform.get_questions_ids_and_labels",
                      side_effect=side_effect)
 
         # execute
@@ -103,3 +103,35 @@ class TestTransformObjectiveQuestions:
         assert output_df.equals(expected_df)
         transform2014_2017.get_questions_ids_and_labels.assert_called_once_with(test_type,
                                                                                 "objective")
+
+
+class TestTransformationTransform:
+
+    def test_transformation_transform(self, mocker: MockerFixture) -> None:
+        # arange
+        def side_effect(df: pd.DataFrame, test_type: str,
+                        question_format: str) -> pd.DataFrame:
+            return df.append({"test_type": test_type,
+                            "question_format": question_format},
+                             ignore_index=True)
+
+        input_df = pd.DataFrame(columns=["test_type", "question_format"])
+        expected_df = pd.DataFrame({"test_type": ["general",
+                                                  'general',
+                                                  "specific",
+                                                  'specific'],
+                                    "question_format": ["objective",
+                                                        "discursive",
+                                                        "objective",
+                                                        "discursive"]})
+
+        mocker.patch("src.transformation.transform_abstract.Transform.transform_questions",
+                     side_effect=side_effect)
+
+        # execute
+        transform = Transform2014_2017()
+        output_df = transform.transform(input_df)
+
+        # assert
+        assert output_df.equals(output_df)
+

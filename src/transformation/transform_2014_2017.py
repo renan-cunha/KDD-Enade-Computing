@@ -1,5 +1,9 @@
 from typing import List
-from src.transformation.transform import Transform
+import os
+import sys
+parent = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')) #this should give you absolute location of my_project folder.
+sys.path.append(parent)
+from src.transformation.transform_abstract import Transform
 
 
 class Transform2014_2017(Transform):
