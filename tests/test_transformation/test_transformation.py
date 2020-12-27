@@ -3,7 +3,7 @@ import os
 from src.transformation import transform
 from pytest_mock import MockerFixture
 import pandas as pd
-
+import subprocess
 
 def test_get_transformed_enade_csv_file_path():
     path = "tmp"
@@ -104,4 +104,36 @@ class TestTransformEnadeYear:
 
         with pytest.raises(ValueError):
             transform.transform_enade_year(input_df, year)
+
+
+def test_main(tmpdir, mocker: MockerFixture):
+    # arrange
+    processed_path = os.path.join(tmpdir, "processed")
+    transformed_path = os.path.join(tmpdir, "transformed")
+    subprocess.run(["mkdir", processed_path])
+
+    def side_effect(df: pd.DataFrame, year: int) -> pd.DataFrame:
+        return df.append({"year": f"{year}"}, ignore_index=True)
+
+    mocker.patch("src.transformation.transform.transform_enade_year",
+                 side_effect=side_effect)
+
+    for year in [2017, 2014, 2011, 2008, 2005]:
+        file_path = os.path.join(processed_path,
+                                 f"microdados_processado_{year}.csv")
+        with open(file_path, "w") as f:
+            f.write("year\n0\n")
+
+    # execute
+
+    transform.main(processed_path, transformed_path)
+
+    # assert
+    for year in [2017, 2014, 2011, 2008, 2005]:
+        file_path = os.path.join(transformed_path,
+                                 f"microdados_transformados_{year}.csv")
+        with open(file_path, "r") as f:
+            data = f.read()
+            assert data == f"year\n0\n{year}\n"
+
 

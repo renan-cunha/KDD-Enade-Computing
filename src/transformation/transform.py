@@ -1,13 +1,13 @@
 import os
 import sys
-parent = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')) #this should give you absolute location of my_project folder.
-sys.path.append(parent)
+import subprocess
 
 import pandas as pd
 
+parent = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')) #this should give you absolute location of my_project folder.
+sys.path.append(parent)
 from src.pre_processing import pre_process
 from src import config
-
 from src.transformation.transform_2005 import Transform2005
 from src.transformation.transform_2008 import Transform2008
 from src.transformation.transform_2011 import Transform2011
@@ -45,6 +45,7 @@ def transform_enade_year(pre_processed_year_df: pd.DataFrame,
 
 def main(pre_processed_data_path: str = pre_process.PROCESSED_DATA_DIR,
          transformed_data_path: str = TRANSFORMED_DATA_DIR) -> None:
+    subprocess.run(["mkdir", "-p", transformed_data_path])
     for year in config.YEARS:
         pre_processed_csv_file_path = pre_process.get_processed_csv_file_path(year,
                                                                               pre_processed_data_path)
