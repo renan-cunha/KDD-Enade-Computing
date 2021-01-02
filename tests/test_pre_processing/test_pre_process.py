@@ -90,5 +90,38 @@ class TestMain:
                 assert data == string
 
 
+class TestReadCsv:
+
+    def test_read_csv(self, tmpdir) -> None:
+        year = 2005
+        # setup
+        file_path = os.path.join(tmpdir, f"microdados_processado_{year}.csv")
+        with open(file_path, "w") as f:
+            f.write("a,b\n1,2")
+        expected_df = pd.DataFrame({"a":[1], "b": [2]})
+
+        # execute
+        output_df = pre_process.read_csv(year, tmpdir)
+
+        # assert
+        assert output_df.equals(expected_df)
 
 
+@pytest.mark.parametrize("input", [2017, 2014, 2011, 2008, 2005])
+@pytest.mark.make
+def test_make_missing_values(input: int) -> None:
+    df = pre_process.read_csv(input)
+    is_present = df['TP_PRES'] == 555
+    missing_answers = df["DS_VT_ESC_OCE"].isna()
+    boolean_series = (is_present & missing_answers)
+    assert boolean_series.any() == False
+
+
+@pytest.mark.parametrize("input", [ 2008, 2005])
+@pytest.mark.make
+def test_make_new_columns(input: int) -> None:
+    df = pre_process.read_csv(input)
+    new_columns = ["DS_VT_ESC_OFG", "DS_VT_ESC_OCE", "DS_VT_ACE_OCE",
+                   "DS_VT_ACE_OFG"]
+    for column in new_columns:
+        assert column in df.columns

@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from src.config import NUM_ENADE_EXAM_QUESTIONS, PRESENCE_COLUMN, \
     CODE_UFPA_COURSE,  \
     ENADE_DATA_DIR, CODE_BLANK_DIS_ANSWER, CODE_CANCELLED_DIS_QUESTION, \
-    BLANK_LABEL, CANCELLED_LABEL, DELETION_LABEL, CODE_CANCELLED_OBJ_QUESTION, \
+    BLANK_ANSWER_LABEL, CANCELLED_LABEL, DELETION_ANSWER_LABEL, CODE_CANCELLED_OBJ_QUESTION, \
     SENIOR_STUDENT_CODE, CODE_COURSE_NEW, CODE_COURSE_OLD
 import os
 
@@ -95,7 +95,7 @@ class ProcessEnade(ABC):
             blank_indices = df[situation_label] == CODE_BLANK_DIS_ANSWER
             cancelled_indices = df[situation_label] == CODE_CANCELLED_DIS_QUESTION
 
-            df.loc[blank_indices, new_column_label] = BLANK_LABEL
+            df.loc[blank_indices, new_column_label] = BLANK_ANSWER_LABEL
 
             status_column = f"QUESTAO_{id}_STATUS"
             df.loc[cancelled_indices, status_column] = CANCELLED_LABEL
@@ -130,10 +130,10 @@ class ProcessEnade(ABC):
             df.loc[cancelled_index, new_column_label] = CANCELLED_LABEL
 
             blank_index = df.loc[:, f"DS_VT_ESC_O{test_label}"].str[question_label] == "."
-            df.loc[blank_index, new_column_label] = BLANK_LABEL
+            df.loc[blank_index, new_column_label] = BLANK_ANSWER_LABEL
 
             deletion_index = df.loc[:, f"DS_VT_ESC_O{test_label}"].str[question_label] == "*"
-            df.loc[deletion_index, new_column_label] = DELETION_LABEL
+            df.loc[deletion_index, new_column_label] = DELETION_ANSWER_LABEL
 
         return df
 
