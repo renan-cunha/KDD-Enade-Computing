@@ -77,3 +77,9 @@ DTYPES = {"DS_VT_ESC_OFG": str,
           "nt_ce_d16": float,
           "nt_dis_ce": float
           }
+
+for i in range(1, 40+1):
+    DTYPES[f"TP_SCE_D{i}"] = float
+    DTYPES[f"tp_sce_d{i}"] = float
+    DTYPES[f"TP_SFG_D{i}"] = float
+    DTYPES[f"tp_sfg_d{i}"] = float

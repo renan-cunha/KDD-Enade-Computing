@@ -1,4 +1,4 @@
-.PHONY: download_data requirements extract_data select_data pre_process_data all
+.PHONY: download_data requirements extract_data select_data pre_process_data transform_data all
 
 PYTHON_INTERPRETER = python3
 #################################################################################
@@ -34,8 +34,14 @@ pre_process_data:
 	$(PYTHON_INTERPRETER) src/pre_processing/pre_process.py
 	@echo "Pre-processing completed"
 
+## Transform data from Processed CSVs
+transform_data:
+	@echo "Transforming data"
+	$(PYTHON_INTERPRETER) src/transformation/transform.py
+	@echo "Data transformed"
+
 ## Run all necessary comamnds
-all: verify_environment requirements download_data extract_data select_data pre_process_data
+all: verify_environment requirements download_data extract_data select_data pre_process_data transform_data
 	@echo "Done"
 
 ## remove data files

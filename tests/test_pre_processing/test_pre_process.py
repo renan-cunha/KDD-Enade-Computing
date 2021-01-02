@@ -2,7 +2,6 @@ import pytest
 from src.pre_processing import pre_process
 import pandas as pd
 import os
-from pytest_mock import MockerFixture
 import subprocess
 
 

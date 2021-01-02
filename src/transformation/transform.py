@@ -3,8 +3,9 @@ import sys
 import subprocess
 
 import pandas as pd
+from tqdm import tqdm
 
-parent = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')) #this should give you absolute location of my_project folder.
+parent = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 sys.path.append(parent)
 from src.pre_processing import pre_process
 from src import config
@@ -15,6 +16,11 @@ from src.transformation.transform_2014_2017 import Transform2014_2017
 
 
 TRANSFORMED_DATA_DIR = os.path.join(config.DATA_DIR, 'transformed_data')
+
+
+def read_csv(year: int, path: str = TRANSFORMED_DATA_DIR) -> pd.DataFrame:
+    return pd.read_csv(get_transformed_enade_csv_file_path(year, path),
+                       dtype=config.DTYPES)
 
 
 def get_transformed_enade_csv_file_path(year: int,
@@ -46,11 +52,14 @@ def transform_enade_year(pre_processed_year_df: pd.DataFrame,
 def main(pre_processed_data_path: str = pre_process.PROCESSED_DATA_DIR,
          transformed_data_path: str = TRANSFORMED_DATA_DIR) -> None:
     subprocess.run(["mkdir", "-p", transformed_data_path])
-    for year in config.YEARS:
-        pre_processed_csv_file_path = pre_process.get_processed_csv_file_path(year,
-                                                                              pre_processed_data_path)
-        pre_processed_year_df = pd.read_csv(pre_processed_csv_file_path)
+    for year in tqdm(config.YEARS):
+        pre_processed_year_df = pre_process.read_csv(year,
+                                                     path=pre_processed_data_path)
         transformed_df_year = transform_enade_year(pre_processed_year_df, year)
         transformed_csv_file_path = get_transformed_enade_csv_file_path(year,
                                                                         path=transformed_data_path)
         transformed_df_year.to_csv(transformed_csv_file_path, index=False)
+
+
+if __name__ == "__main__":
+    main()

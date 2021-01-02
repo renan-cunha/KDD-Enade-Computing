@@ -14,6 +14,11 @@ from tqdm import tqdm
 PROCESSED_DATA_DIR = os.path.join(DATA_DIR, "processed_data")
 
 
+def read_csv(year: int, path: str = PROCESSED_DATA_DIR) -> pd.DataFrame:
+    return pd.read_csv(get_processed_csv_file_path(year, path),
+                       dtype=config.DTYPES)
+
+
 def get_processed_csv_file_path(year: int,
                                 path: str = PROCESSED_DATA_DIR) -> str:
     return os.path.join(path, f"microdados_processado_{year}.csv")

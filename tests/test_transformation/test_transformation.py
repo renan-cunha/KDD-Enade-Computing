@@ -4,6 +4,8 @@ from src.transformation import transform
 from pytest_mock import MockerFixture
 import pandas as pd
 import subprocess
+import numpy as np
+
 
 def test_get_transformed_enade_csv_file_path():
     path = "tmp"
@@ -137,3 +139,84 @@ def test_main(tmpdir, mocker: MockerFixture):
             assert data == f"year\n0\n{year}\n"
 
 
+@pytest.mark.make
+class TestMake:
+
+    score_columns = [f"QUESTAO_{x}_NOTA" for x in range(1, 40 + 1)]
+    situation_columns = [f"QUESTAO_{x}_SITUACAO" for x in range(1, 40 + 1)]
+
+    @pytest.mark.parametrize("year", [2017, 2014, 2011, 2008, 2005])
+    def test_make_have_columns(self, year: int) -> None:
+        df = transform.read_csv(year)
+        columns = TestMake.score_columns + TestMake.situation_columns
+        for column in columns:
+            assert column in df.columns
+
+    @pytest.mark.parametrize("year", [2017, 2014, 2011, 2008, 2005])
+    def test_make_score_columns_format(self, year: int):
+        df = transform.read_csv(year)
+        for column in TestMake.score_columns:
+            column_series = df[column]
+            assert column_series.dtype == float
+            column_series_dropped = df[column].dropna()
+            if len(column_series_dropped > 0):
+                assert column_series_dropped.min() >= 0
+                assert column_series.max() <= 100
+
+    @pytest.mark.parametrize("year", [2017, 2014, 2011, 2008, 2005])
+    def test_make_situation_columns_format(self, year: int):
+        df = transform.read_csv(year)
+        possible_values = {np.nan, "ok", "branco", "rasura"}
+        for column in TestMake.situation_columns:
+            column_series = df[column]
+            if len(column_series.dropna()) > 0:
+                assert column_series.dtype == object
+                current_values = set(pd.unique(column_series))
+                assert current_values.issubset(possible_values)
+
+
+@pytest.mark.make()
+class TestQuestions:
+
+    cancelled_questions_2017 = [26, 30, 31]
+    cancelled_questions_2014 = [16, 23, 26, 36, 38, 39]
+    cancelled_questions_2011 = [18, 22, 28, 29, 38, 40]
+    cancelled_questions_2005 = [11, 26, 27, 34, 36, 39, 40]
+
+    situation_possible_values = {"ok", 'branco', 'rasura'}
+
+    def test_2017(self):
+        questions_ids = TestQuestions.cancelled_questions_2017
+        score_columns = [f'QUESTAO_{x}_NOTA' for x in questions_ids]
+        situation_columns = [f"QUESTAO_{x}_SITUACAO" for x in questions_ids]
+        df = transform.read_csv(2017)
+        df_isna = df[score_columns + situation_columns].isna()
+        all_df_is_na = df_isna.all()
+        assert all_df_is_na.all()
+
+    def test_2014(self):
+        questions_ids = TestQuestions.cancelled_questions_2014
+        score_columns = [f'QUESTAO_{x}_NOTA' for x in questions_ids]
+        situation_columns = [f"QUESTAO_{x}_SITUACAO" for x in questions_ids]
+        df = transform.read_csv(2014)
+        df_isna = df[score_columns + situation_columns].isna()
+        all_df_is_na = df_isna.all()
+        assert all_df_is_na.all()
+
+    def test_2011(self):
+        questions_ids = TestQuestions.cancelled_questions_2011
+        score_columns = [f'QUESTAO_{x}_NOTA' for x in questions_ids]
+        situation_columns = [f"QUESTAO_{x}_SITUACAO" for x in questions_ids]
+        df = transform.read_csv(2011)
+        df_isna = df[score_columns + situation_columns].isna()
+        all_df_is_na = df_isna.all()
+        assert all_df_is_na.all()
+
+    def test_2005(self):
+        questions_ids = TestQuestions.cancelled_questions_2005
+        score_columns = [f'QUESTAO_{x}_NOTA' for x in questions_ids]
+        situation_columns = [f"QUESTAO_{x}_SITUACAO" for x in questions_ids]
+        df = transform.read_csv(2005)
+        df_isna = df[situation_columns + score_columns].isna()
+        all_df_is_na = df_isna.all()
+        assert all_df_is_na.all()
