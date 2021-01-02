@@ -199,3 +199,31 @@ class TestReadCsv:
         output_df = data.read_csv(year)
 
         assert output_df.equals(input_df)
+
+
+ENADE_DATA_PATH = os.path.join('data', 'raw_data', 'enade_data')
+
+
+class TestMakeDownloadData:
+    @pytest.mark.parametrize("input,expected", [(2005, 27682769),
+                                                (2008, 37755081),
+                                                (2011, 24917485),
+                                                (2014, 40651249),
+                                                (2017, 45740121)])
+    @pytest.mark.make()
+    def test_make_download_data(self, input, expected) -> None:
+        path_year = os.path.join(ENADE_DATA_PATH, f'enade_{input}',
+                                 f"microdados_enade_{input}.zip")
+        assert os.path.getsize(path_year) == expected
+
+
+class TestMakeExtractData:
+    @pytest.mark.parametrize("input,expected", [(2005, (323338, 210)),
+                                                (2008, (461776, 198)),
+                                                (2011, (376180, 115)),
+                                                (2014, (481720, 154)),
+                                                (2017, (537436, 150))])
+    @pytest.mark.make()
+    def test_make_extract_data(self, input, expected) -> None:
+        get_data = GetData()
+        assert get_data.read_csv(input).shape == expected

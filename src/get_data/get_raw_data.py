@@ -3,7 +3,7 @@ import os
 parent = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')) #this should give you absolute location of my_project folder.
 sys.path.append(parent)
 from urllib.request import urlretrieve
-from src.config import YEARS, DATA_DIR
+from src.config import YEARS, DATA_DIR, DTYPES
 from typing import Callable
 from tqdm import tqdm
 import click
@@ -125,43 +125,19 @@ class GetData:
         file_path = get_raw_enade_csv_file_path(year,
                                                 raw_enade_data_dir=self.raw_data_path)
         return pd.read_csv(file_path, sep=";", decimal=",",
-                           dtype={"DS_VT_ESC_OFG": str,
-                                  "DS_VT_ESC_OCE": str,
-                                  "DS_VT_ACE_OCE": str,
-                                  "DS_VT_ACE_OFG": str,
-                                  "NT_OBJ_CE": str,
-                                  "CO_IES": str,
-                                  "CO_CURSO": str,
-                                  "CO_MUNIC_CURSO": str})
+                           dtype=DTYPES)
 
     def __read_csv_2008(self) -> pd.DataFrame:
         file_path = get_raw_enade_csv_file_path(2008,
                                                 raw_enade_data_dir=self.raw_data_path)
         return pd.read_csv(file_path, sep=";", decimal=".",
-                           dtype={"vt_esc_ofg": str,
-                                  "vt_esc_oce": str,
-                                  "vt_ace_oce": str,
-                                  "vt_ace_ofg": str,
-                                  "nt_obj_ce": str,
-                                  "co_grupo": int,
-                                  "nt_fg_d2": float,
-                                  "nt_ce_d3": float,
-                                  "nt_ce_d6": float,
-                                  "nt_dis_ce": float})
+                           dtype=DTYPES)
 
     def __read_csv_2005(self) -> pd.DataFrame:
         file_path = get_raw_enade_csv_file_path(2005,
                                                 raw_enade_data_dir=self.raw_data_path)
-        dtype = {"vt_esc_ofg": str,
-                 "vt_esc_oce": str,
-                 "vt_ace_oce": str,
-                 "vt_ace_ofg": str,
-                 "nt_obj_ce": str,
-                 "nt_dis_ce": str}
-        for i in range(1, 16):
-            dtype[f"nt_ce_d{i}"] = float
         return pd.read_csv(file_path, sep=";", decimal=".",
-                           dtype=dtype,
+                           dtype=DTYPES,
                            encoding='latin')
 
     def read_csv(self, year: int) -> pd.DataFrame:
@@ -172,7 +148,7 @@ class GetData:
         elif year == 2005:
             return self.__read_csv_2005()
         else:
-            raise ValueError(f"Year should be one of {config.YEARS}, "
+            raise ValueError(f"Year should be one of {YEARS}, "
                              f"not {year}")
 
 
