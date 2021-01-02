@@ -222,3 +222,32 @@ class TestReadCsv:
 
         # assert
         assert output_df.equals(expected_df)
+
+
+@pytest.mark.make()
+@pytest.mark.parametrize("year", [2017, 2014, 2011])
+def test_make_select_data_2017_2014_2011(year):
+    df = select_data.read_csv(year)
+    boolean_series = df['CO_GRUPO'] == 4004
+    assert boolean_series.all()
+
+
+@pytest.mark.make()
+def test_make_select_data_2008():
+    df = select_data.read_csv(2008)
+    is_of_computer_science = df['co_subarea'] == 4001
+    is_senior_student = df['in_grad'] == 0
+    boolean_series = is_of_computer_science & is_senior_student
+    assert boolean_series.all()
+
+
+@pytest.mark.make()
+def test_make_select_data_2005():
+    df = select_data.read_csv(2005)
+    is_of_computer_science = df['co_grupo'] == 40
+    is_senior_student = df['in_grad'] == 0
+    boolean_series = is_of_computer_science & is_senior_student
+    assert boolean_series.all()
+
+
+

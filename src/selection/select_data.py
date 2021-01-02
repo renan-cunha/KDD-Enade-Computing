@@ -4,9 +4,8 @@ import os
 import sys
 
 
-parent = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')) #this should give you absolute location of my_project folder.
+parent = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 sys.path.append(parent)
-from src import config
 from src.get_data import get_raw_data
 from src import config
 from tqdm import tqdm
@@ -20,7 +19,8 @@ COMPUTER_CODE_2005 = 40
 
 
 def read_csv(year: int, path: str = SELECTED_DATA_DIR) -> pd.DataFrame:
-    return pd.read_csv(get_selected_enade_csv_file_path(year, path))
+    return pd.read_csv(get_selected_enade_csv_file_path(year, path),
+                       dtype=config.DTYPES)
 
 
 def get_selected_enade_csv_file_path(year: int,
@@ -105,23 +105,11 @@ def select_ufpa_computer_science_2005(df: pd.DataFrame) -> pd.DataFrame:
     return df.loc[df["co_curso"] == config.CODE_UFPA_COURSE]
 
 
-def filter_specific_score_2005(df: pd.DataFrame) -> pd.DataFrame:
+def filter_specific_score_2005(df: pd.DataFrame) -> pd.Series:
     return df["vt_ace_oce"]
 
 
 def filter_computer_science_2005(df: pd.DataFrame) -> pd.DataFrame:
-
-    """
-    def is_computer_science(score_questions: str) -> bool:
-        start = "." * 28
-        end = "." * 14
-        if type(score_questions) == float:
-            return False
-        if score_questions.startswith(start) and score_questions.endswith(end):
-            # if it has at least one answer different than blank
-            return True
-        else:
-            return False"""
 
     ufpa_comp_sci = select_ufpa_computer_science_2005(df)
     ufpa_comp_sci_specific_score = filter_specific_score_2005(ufpa_comp_sci)

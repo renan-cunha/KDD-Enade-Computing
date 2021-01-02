@@ -43,3 +43,37 @@ ENADE_DATA_DIR = os.path.join(DATA_DIR, "enade")
 SUBJECT_DF_NAME = "classificacao_charao.csv"
 SUBJECT_DF_PATH = os.path.join(DATA_DIR, SUBJECT_DF_NAME)
 SUBJECT_CONTENT_COLUMNS = ["conteudo1", "conteudo2", "conteudo3"]
+
+DTYPES = {"DS_VT_ESC_OFG": str,
+          "DS_VT_ESC_OCE": str,
+          "DS_VT_ACE_OCE": str,
+          "DS_VT_ACE_OFG": str,
+          "NT_OBJ_CE": str,
+          "CO_IES": str,
+          "CO_CURSO": str,
+          "CO_MUNIC_CURSO": str,
+          "vt_esc_ofg": str,
+          "vt_esc_oce": str,
+          "vt_ace_oce": str,
+          "vt_ace_ofg": str,
+          "nt_obj_ce": str,
+          "co_grupo": int,
+          "nt_fg_d2": float,
+          "nt_ce_d1": float,
+          "nt_ce_d2": float,
+          "nt_ce_d3": float,
+          "nt_ce_d4": float,
+          "nt_ce_d5": float,
+          "nt_ce_d6": float,
+          "nt_ce_d7": float,
+          "nt_ce_d8": float,
+          "nt_ce_d9": float,
+          "nt_ce_d10": float,
+          "nt_ce_d11": float,
+          "nt_ce_d12": float,
+          "nt_ce_d13": float,
+          "nt_ce_d14": float,
+          "nt_ce_d15": float,
+          "nt_ce_d16": float,
+          "nt_dis_ce": float
+          }
