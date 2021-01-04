@@ -250,4 +250,11 @@ def test_make_select_data_2005():
     assert boolean_series.all()
 
 
-
+@pytest.mark.parametrize("year,label,expected", [(2005, 'tp_pres', 6734),
+                                                 (2008, "tp_pres", 6434),
+                                                 (2017, "TP_PRES", 8491)])
+@pytest.mark.make()
+def test_make_select_data_shape(year: int, label: str, expected: int) -> None:
+    df = select_data.read_csv(year)
+    df_student_present = df.loc[df[label] == 555]
+    assert df_student_present.shape[0] == expected
