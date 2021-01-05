@@ -43,6 +43,11 @@ def rename_columns_2008_2005(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def mutiply_by_ten_discursive_general_2008(df: pd.DataFrame) -> pd.DataFrame:
+    df[['NT_FG_D1', 'NT_FG_D2']] *= 10
+    return df
+
+
 def main(select_path: str = select_data.SELECTED_DATA_DIR,
          processed_path: str = PROCESSED_DATA_DIR):
 
@@ -51,6 +56,8 @@ def main(select_path: str = select_data.SELECTED_DATA_DIR,
         df_year = select_data.read_csv(year, select_path)
         if year in [2008, 2005]:
             df_year = rename_columns_2008_2005(df_year)
+            if year == 2008:
+                df_year = mutiply_by_ten_discursive_general_2008(df_year)
         df_year_cleaned = remove_missing_data(df_year)
         file_path = get_processed_csv_file_path(year, processed_path)
         df_year_cleaned.to_csv(file_path, index=False)

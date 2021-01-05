@@ -60,9 +60,9 @@ class TestMain:
         data_2017 = "DS_VT_ESC_OCE,TP_PRES\n1,2\n"
         data_2014 = "DS_VT_ESC_OCE,TP_PRES\n2,3\n"
         data_2011 = "DS_VT_ESC_OCE,TP_PRES\n3,4\n"
-        data_2008 = "vt_esc_oce,tp_pres\n4,5\n"
+        data_2008 = "vt_esc_oce,tp_pres,nt_fg_d1,nt_fg_d2\n4,5,1,2\n"
         data_2005 = "vt_esc_oce,tp_pres\n5,6\n"
-        output_data_2008 = "DS_VT_ESC_OCE,TP_PRES\n4,5\n"
+        output_data_2008 = "DS_VT_ESC_OCE,TP_PRES,NT_FG_D1,NT_FG_D2\n4,5,10,20.0\n"
         output_data_2005 = "DS_VT_ESC_OCE,TP_PRES\n5,6\n"
 
         years = [2017, 2014, 2011, 2008, 2005]
