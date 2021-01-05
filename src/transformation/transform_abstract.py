@@ -11,12 +11,12 @@ from src import config
 
 
 BLANK_DISCURSIVE_ANSWER_CODE = 333
-VALID_DISCURSIVE_ANSWER_CODE = 555
+VALID_DISCURSIVE_ANSWER_CODE = [555, 336]
 
 BLANK_OBJECTIVE_ANSWER_CODE = "."
 DELETED_OBJECTIVE_ANSWER_CODE = "*"
 CANCELLED_OBJECTIVE_ANSWER_CODE = ["8", "9"]
-VALID_OBJECTIVE_ANSWER_CODE = ["1", "0"]
+VALID_OBJECTIVE_ANSWER_CODE = ["A", "B", "C", "D", "E"]
 
 
 
@@ -170,11 +170,13 @@ class Transform(ABC):
                                                    test_label: str) -> pd.DataFrame:
         situation_column = f"TP_S{test_label}_D{question_label}"
         new_situation_column = Transform.get_score_situation(id)
-        df[new_situation_column] = df[situation_column].replace(
-            {BLANK_DISCURSIVE_ANSWER_CODE: config.BLANK_ANSWER_LABEL,
-             VALID_DISCURSIVE_ANSWER_CODE: config.VAlID_ANSWER_LABEL})
+        df[new_situation_column] = df[situation_column]
+        df[new_situation_column] = df[new_situation_column].replace(BLANK_DISCURSIVE_ANSWER_CODE,
+                                                                config.BLANK_ANSWER_LABEL)
+        df[new_situation_column] = df[new_situation_column].replace(VALID_DISCURSIVE_ANSWER_CODE,
+                                                                    config.VAlID_ANSWER_LABEL)
 
-        def num_to_nan(x:object) -> object:
+        def num_to_nan(x: object) -> object:
             if type(x) == int or type(x) == float:
                 return np.nan
             else:
@@ -207,10 +209,8 @@ class Transform(ABC):
         new_column_label = Transform.get_score_column(id)
         df[new_column_label] = df[f"DS_VT_ACE_O{test_label}"].str[
             question_label]
-        df[new_column_label] = df[new_column_label].replace([BLANK_OBJECTIVE_ANSWER_CODE,
-                                                             DELETED_OBJECTIVE_ANSWER_CODE], "0")
-        if (df[new_column_label].isin(CANCELLED_OBJECTIVE_ANSWER_CODE)).any():
-                df[new_column_label] = np.nan
+        df[new_column_label] = df[new_column_label].replace(BLANK_OBJECTIVE_ANSWER_CODE, "0")
+        df[new_column_label] = df[new_column_label].replace(CANCELLED_OBJECTIVE_ANSWER_CODE, np.nan)
         df[new_column_label] = df[new_column_label].astype(float)
         df[new_column_label] *= 100
         return df
@@ -223,14 +223,17 @@ class Transform(ABC):
         new_column_label = Transform.get_score_situation(id)
         df[new_column_label] = df[f"DS_VT_ACE_O{test_label}"].str[
             question_label]
-        df[new_column_label] = df[new_column_label].replace(VALID_OBJECTIVE_ANSWER_CODE,
-                                                            config.VAlID_ANSWER_LABEL)
-        df[new_column_label] = df[new_column_label].replace(DELETED_OBJECTIVE_ANSWER_CODE,
-                                                            config.DELETION_ANSWER_LABEL)
         if (df[new_column_label].isin(CANCELLED_OBJECTIVE_ANSWER_CODE)).any():
             df[new_column_label] = np.nan
-        df[new_column_label] = df[new_column_label].replace(BLANK_OBJECTIVE_ANSWER_CODE,
+        else:
+            df[new_column_label] = df[f"DS_VT_ESC_O{test_label}"].str[
+                question_label]
+            df[new_column_label] = df[new_column_label].replace(BLANK_OBJECTIVE_ANSWER_CODE,
                                                             config.BLANK_ANSWER_LABEL)
+            df[new_column_label] = df[new_column_label].replace(VALID_OBJECTIVE_ANSWER_CODE,
+                                                            config.VAlID_ANSWER_LABEL)
+            df[new_column_label] = df[new_column_label].replace(DELETED_OBJECTIVE_ANSWER_CODE,
+                                                            config.DELETION_ANSWER_LABEL)
         return df
 
 

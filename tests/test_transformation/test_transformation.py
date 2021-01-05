@@ -185,38 +185,39 @@ class TestQuestions:
 
     situation_possible_values = {"ok", 'branco', 'rasura'}
 
-    def test_2017(self):
-        questions_ids = TestQuestions.cancelled_questions_2017
-        score_columns = [f'QUESTAO_{x}_NOTA' for x in questions_ids]
+    @pytest.mark.parametrize("year,questions_ids", [(2017, cancelled_questions_2017),
+                                                (2014, cancelled_questions_2014),
+                                                (2011, cancelled_questions_2011),
+                                                (2005, cancelled_questions_2005)])
+    def test(self, year, questions_ids):
         situation_columns = [f"QUESTAO_{x}_SITUACAO" for x in questions_ids]
-        df = transform.read_csv(2017)
-        df_isna = df[score_columns + situation_columns].isna()
+        df = transform.read_csv(year)
+        df_isna = df[situation_columns].isna()
         all_df_is_na = df_isna.all()
         assert all_df_is_na.all()
 
-    def test_2014(self):
-        questions_ids = TestQuestions.cancelled_questions_2014
-        score_columns = [f'QUESTAO_{x}_NOTA' for x in questions_ids]
-        situation_columns = [f"QUESTAO_{x}_SITUACAO" for x in questions_ids]
-        df = transform.read_csv(2014)
-        df_isna = df[score_columns + situation_columns].isna()
-        all_df_is_na = df_isna.all()
-        assert all_df_is_na.all()
 
-    def test_2011(self):
-        questions_ids = TestQuestions.cancelled_questions_2011
-        score_columns = [f'QUESTAO_{x}_NOTA' for x in questions_ids]
-        situation_columns = [f"QUESTAO_{x}_SITUACAO" for x in questions_ids]
-        df = transform.read_csv(2011)
-        df_isna = df[score_columns + situation_columns].isna()
-        all_df_is_na = df_isna.all()
-        assert all_df_is_na.all()
+@pytest.mark.make()
+class TestQuestionsMeanScore:
 
-    def test_2005(self):
-        questions_ids = TestQuestions.cancelled_questions_2005
-        score_columns = [f'QUESTAO_{x}_NOTA' for x in questions_ids]
-        situation_columns = [f"QUESTAO_{x}_SITUACAO" for x in questions_ids]
-        df = transform.read_csv(2005)
-        df_isna = df[situation_columns + score_columns].isna()
-        all_df_is_na = df_isna.all()
-        assert all_df_is_na.all()
+    expected_df = pd.read_csv("tests/test_mean_score_question_id.csv",
+                              decimal=",")
+
+    @pytest.mark.parametrize("year", [2017, 2014, 2011, 2008, 2005])
+    def test_year(self, year: int) -> None:
+        # arrange
+        expected = TestQuestionsMeanScore.expected_df.copy()
+        expected_year = expected.loc[expected["ano"] == year, ["acertosbrasil", "id"]]
+        expected_year_mean_values = expected_year["acertosbrasil"].values.flatten()
+
+        # execute
+        df = transform.read_csv(year)
+        present_df = df.loc[df['TP_PRES'].isin([555])]
+        score_columns = [f"QUESTAO_{x}_NOTA" for x in expected_year['id']]
+        present_df_mean_score = present_df[score_columns].mean()
+        present_df_mean_score_values = present_df_mean_score.values.flatten()
+        result = present_df_mean_score_values - expected_year_mean_values
+
+        # assert
+        assert max(abs(result)) == pytest.approx(0, abs=1.0)
+

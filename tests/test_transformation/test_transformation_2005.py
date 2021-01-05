@@ -71,8 +71,10 @@ class TestTransformObjectiveQuestions:
                                            mocker: MockerFixture) -> None:
         test_type, label = input
         # arrange
-        input_df = pd.DataFrame({f"DS_VT_ACE_O{label}": ["01.*89"]})
-        expected_df = pd.DataFrame({f"DS_VT_ACE_O{label}": ["01.*89"],
+        input_df = pd.DataFrame({f"DS_VT_ACE_O{label}": ["010089"],
+                                 f"DS_VT_ESC_O{label}": ["AB.*CD"]})
+        expected_df = pd.DataFrame({f"DS_VT_ACE_O{label}": ["010089"],
+                                    f"DS_VT_ESC_O{label}": ["AB.*CD"],
                                     "QUESTAO_1_SITUACAO": ["ok"],
                                     "QUESTAO_1_NOTA": [0.0],
                                     "QUESTAO_2_SITUACAO": ["ok"],
