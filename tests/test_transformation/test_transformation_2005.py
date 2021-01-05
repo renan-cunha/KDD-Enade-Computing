@@ -28,8 +28,8 @@ class TestTransformDiscursiveQuestions2005:
 
     @pytest.mark.parametrize("input", [("specific", "CE"),
                                        ("general", "FG")])
-    def test_transform_discursive_scores_2008_specific(self, input,
-                                                            mocker: MockerFixture) -> None:
+    def test_transform_discursive_scores(self, input,
+                                         mocker: MockerFixture) -> None:
         # arrange
         test_type, label = input
         input_df = pd.DataFrame({f"NT_{label}_D1": [0, 50],
