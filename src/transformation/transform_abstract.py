@@ -170,7 +170,10 @@ class Transform(ABC):
     def __add_column_question_situation_discursive_question(df: pd.DataFrame,
                                                             id: int) -> pd.DataFrame:
         new_column_label = Transform.get_question_situation_column(id)
-        df[new_column_label] = 0
+        answer_situation_column = Transform.get_answer_situation_column(id)
+        df[new_column_label] = df[answer_situation_column]
+        df.loc[~df[new_column_label].isna(), new_column_label] = 0
+        df.loc[df[new_column_label].isna(), new_column_label] = 1
         return df
 
     @staticmethod

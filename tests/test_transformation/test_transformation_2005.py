@@ -46,7 +46,7 @@ class TestTransformDiscursiveQuestions2005:
                                     "QUESTAO_1_SITUACAO_DA_QUESTAO": [0, 0],
                                     "QUESTAO_2_SITUACAO_DA_RESPOSTA": [np.nan, np.nan],
                                     "QUESTAO_2_NOTA": [np.nan, np.nan],
-                                    "QUESTAO_2_SITUACAO_DA_QUESTAO": [0, 0]}
+                                    "QUESTAO_2_SITUACAO_DA_QUESTAO": [1.0, 1.0]}
         )
 
         def side_effect(test_type: str,
@@ -62,7 +62,8 @@ class TestTransformDiscursiveQuestions2005:
                                                            "discursive")
 
         # assert
-        assert output_df.equals(expected_df)
+
+        assert output_df.fillna("").equals(expected_df.fillna(""))
 
 
 class TestTransformObjectiveQuestions:

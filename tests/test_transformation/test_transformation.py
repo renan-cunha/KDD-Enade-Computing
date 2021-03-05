@@ -143,12 +143,13 @@ def test_main(tmpdir, mocker: MockerFixture):
 class TestMake:
 
     score_columns = [f"QUESTAO_{x}_NOTA" for x in range(1, 40 + 1)]
-    situation_columns = [f"QUESTAO_{x}_SITUACAO" for x in range(1, 40 + 1)]
+    answer_situation_columns = [f"QUESTAO_{x}_SITUACAO_DA_RESPOSTA" for x in range(1, 40 + 1)]
+    question_situation_columns = [f"QUESTAO_{x}_SITUACAO_DA_QUESTAO" for x in range(1, 40 + 1)]
 
     @pytest.mark.parametrize("year", [2017, 2014, 2011, 2008, 2005])
     def test_make_have_columns(self, year: int) -> None:
         df = transform.read_csv(year)
-        columns = TestMake.score_columns + TestMake.situation_columns
+        columns = TestMake.score_columns + TestMake.answer_situation_columns + TestMake.question_situation_columns
         for column in columns:
             assert column in df.columns
 
@@ -167,7 +168,7 @@ class TestMake:
     def test_make_situation_columns_format(self, year: int):
         df = transform.read_csv(year)
         possible_values = {np.nan, "ok", "branco", "rasura"}
-        for column in TestMake.situation_columns:
+        for column in TestMake.answer_situation_columns:
             column_series = df[column]
             if len(column_series.dropna()) > 0:
                 assert column_series.dtype == object
@@ -185,15 +186,21 @@ class TestQuestions:
 
     situation_possible_values = {"ok", 'branco', 'rasura'}
 
-    @pytest.mark.parametrize("year,questions_ids", [(2017, cancelled_questions_2017),
-                                                (2014, cancelled_questions_2014),
-                                                (2011, cancelled_questions_2011),
-                                                (2005, cancelled_questions_2005)])
+    @pytest.mark.parametrize("year,questions_ids", [(2017,
+                                                     cancelled_questions_2017),
+                                                    (2014,
+                                                     cancelled_questions_2014),
+                                                    (2011,
+                                                     cancelled_questions_2011),
+                                                    (2005,
+                                                     cancelled_questions_2005)])
     def test(self, year, questions_ids):
-        situation_columns = [f"QUESTAO_{x}_SITUACAO" for x in questions_ids]
+        situation_columns = [f"QUESTAO_{x}_SITUACAO_DA_QUESTAO" for x in questions_ids]
         df = transform.read_csv(year)
-        df_isna = df[situation_columns].isna()
+        df_isna = df[situation_columns] == 1
+        print(df_isna)
         all_df_is_na = df_isna.all()
+        print(all_df_is_na)
         assert all_df_is_na.all()
 
 
