@@ -2,12 +2,13 @@ import pandas as pd
 from typing import Union, List, Callable
 import numpy as np
 from src.config import NUM_ENADE_EXAM_QUESTIONS, MAX_SUBJECTS_PER_QUESTION, \
-    STUDENT_CODE_ABSENT, STUDENT_CODE_PRESENT, BLANK_LABEL, DELETION_LABEL, \
+    STUDENT_CODE_ABSENT, STUDENT_CODE_PRESENT, BLANK_ANSWER_LABEL, DELETION_ANSWER_LABEL, \
     DIFFICULTIES
 from src.process2014_2017 import ProcessEnade2014_2017
 from src.process2011 import ProcessEnade2011
 from src.process2008 import ProcessEnade2008
 from src.process2005 import ProcessEnade2005
+from src.transformation import transform
 
 
 def map_presence(df: pd.DataFrame) -> None:
@@ -71,7 +72,7 @@ def add_columns_objective_score(df: pd.DataFrame) -> pd.DataFrame:
 
 def is_question_cancelled(id_question: str, df_enade: pd.DataFrame) -> bool:
     """Returns True if the question is cancelled and False otherwise."""
-    if df_enade[f"QUESTAO_{id_question}_STATUS"].iloc[0] == "NULA":
+    if df_enade[f"QUESTAO_{id_question}_SITUACAO_DA_QUESTAO"].iloc[0] == 1:
         result = True
     else:
         result = False
@@ -183,8 +184,9 @@ def add_column_objective_score_category(category: str, df_enade: pd.DataFrame,
     sum_score = np.array([0.0] * df_enade.shape[0])  # number of participants
     for question in questions:
         question_score = df_enade[f"QUESTAO_{question}_NOTA"].copy()
-        blank_question_score_index = question_score == BLANK_LABEL
-        deletion_question_score_index = question_score == DELETION_LABEL
+        question_situation = df_enade[f"QUESTAO_{question}_SITUACAO_DA_RESPOSTA"].copy()
+        blank_question_score_index = question_situation == BLANK_ANSWER_LABEL
+        deletion_question_score_index = question_situation == DELETION_ANSWER_LABEL
         zero_score_index = blank_question_score_index | deletion_question_score_index
         question_score[zero_score_index] = 0
         sum_score += pd.to_numeric(question_score)

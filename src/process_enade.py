@@ -2,15 +2,14 @@ from typing import List, Callable
 import pandas as pd
 from abc import ABC, abstractmethod
 from src.config import NUM_ENADE_EXAM_QUESTIONS, PRESENCE_COLUMN, \
-    CODE_UFPA_COURSE,  \
+    CODE_COURSE,  \
     ENADE_DATA_DIR, CODE_BLANK_DIS_ANSWER, CODE_CANCELLED_DIS_QUESTION, \
     BLANK_ANSWER_LABEL, CANCELLED_LABEL, DELETION_ANSWER_LABEL, CODE_CANCELLED_OBJ_QUESTION, \
     SENIOR_STUDENT_CODE, CODE_COURSE_NEW, CODE_COURSE_OLD
 import os
 
-"""
 def filter_enade_df_by_ufpa_course(df: pd.DataFrame) -> pd.DataFrame:
-    return df.loc[df["CO_CURSO"] == CODE_UFPA_COURSE]
+    return df.loc[df["CO_CURSO"] == CODE_COURSE]
 
 
 def filter_enade_df_by_course_new(df: pd.DataFrame) -> pd.DataFrame:
@@ -30,7 +29,6 @@ def get_old_enade_dir(year: int) -> str:
     "Used for enade 2005 and 2008"
     return os.path.join(ENADE_DATA_DIR, f"enade{year}", "2.DADOS",
                         f"microdados_enade_{year}.csv")
-"""
 
 
 def filter_senior_students(df: pd.DataFrame) -> pd.DataFrame:

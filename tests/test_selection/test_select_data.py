@@ -66,8 +66,8 @@ class TestFilter2005:
 
     def test_example(self) -> None:
 
-        input_dataframe = pd.DataFrame({"co_curso": [config.CODE_UFPA_COURSE,
-                                                     config.CODE_UFPA_COURSE,
+        input_dataframe = pd.DataFrame({"co_curso": [config.CODE_COURSE,
+                                                     config.CODE_COURSE,
                                                      1245, 1256, 1257],
                                         "vt_ace_oce": [".abc..", ".ab...",
                                                        ".acc..",
@@ -75,8 +75,8 @@ class TestFilter2005:
                                                        ".abc.."],
                                         "co_grupo": [40, 40, 40, 40, 12]})
 
-        expected_df = pd.DataFrame({"co_curso": [config.CODE_UFPA_COURSE,
-                                                 config.CODE_UFPA_COURSE,
+        expected_df = pd.DataFrame({"co_curso": [config.CODE_COURSE,
+                                                 config.CODE_COURSE,
                                                  1245],
                                     "vt_ace_oce": [".abc..", ".ab...",
                                                   ".acc.."],

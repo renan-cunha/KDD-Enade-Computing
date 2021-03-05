@@ -54,8 +54,12 @@ class Transform(ABC):
         return f"QUESTAO_{id}_NOTA"
 
     @staticmethod
-    def get_score_situation(id: int) -> str:
-        return f"QUESTAO_{id}_SITUACAO"
+    def get_answer_situation_column(id: int) -> str:
+        return f"QUESTAO_{id}_SITUACAO_DA_RESPOSTA"
+
+    @staticmethod
+    def get_question_situation_column(id: int) -> str:
+        return f"QUESTAO_{id}_SITUACAO_DA_QUESTAO"
 
     @property
     def general_discursive_questions_ids(self) -> List[int]:
@@ -103,6 +107,9 @@ class Transform(ABC):
         Also Creates columns 'QUESTAO_{id}_SITUACAO'
         they can have the values "ok", "branco" and "rasura"
 
+        And Creates columns 'QUESTAO_{id}_CANCELLED'
+        that can have values of 1 or 0
+
         test_type is "general" or "specific"
         question_format is "discursive" or "objective"
         """
@@ -134,24 +141,51 @@ class Transform(ABC):
     def __add_column_objective_question(df: pd.DataFrame, id: int,
                                         question_label: int,
                                         test_label: str) -> pd.DataFrame:
-        df = Transform.__add_column_situation_objective_question(df, id,
-                                                            question_label,
-                                                            test_label)
+        df = Transform.__add_column_answer_situation_objective_question(df, id,
+                                                                        question_label,
+                                                                        test_label)
         df = Transform.__add_column_score_objective_question(df, id,
                                                         question_label,
                                                         test_label)
+        df = Transform.__add_column_question_situation_objective_question(df, id,
+                                                                          question_label,
+                                                                          test_label)
         return df
+
+
 
     @staticmethod
     def __add_column_discursive_question(df: pd.DataFrame, id: int,
                                          question_label: int,
                                          test_label: str) -> pd.DataFrame:
-        df = Transform.__add_column_situation_discursive_question(
+        df = Transform.__add_column_answer_situation_discursive_question(
             df, id, question_label, test_label)
         df = Transform.__add_column_score_discursive_question(df, id,
                                                          question_label,
                                                          test_label)
+        df = Transform.__add_column_question_situation_discursive_question(df, id)
         return df
+
+    @staticmethod
+    def __add_column_question_situation_discursive_question(df: pd.DataFrame,
+                                                            id: int) -> pd.DataFrame:
+        new_column_label = Transform.get_question_situation_column(id)
+        df[new_column_label] = 0
+        return df
+
+    @staticmethod
+    def __add_column_question_situation_objective_question(df: pd.DataFrame, id: int,
+                                                           question_label: int,
+                                                           test_label: str) -> pd.DataFrame:
+        new_column_label = Transform.get_question_situation_column(id)
+        df[new_column_label] = df[f"DS_VT_ACE_O{test_label}"].str[
+            question_label]
+        if (df[new_column_label].isin(CANCELLED_OBJECTIVE_ANSWER_CODE)).any():
+            df[new_column_label] = 1
+        else:
+            df[new_column_label] = 0
+        return df
+
 
     @staticmethod
     def __add_column_score_discursive_question(df: pd.DataFrame, id: int,
@@ -160,16 +194,17 @@ class Transform(ABC):
         score_column = f"NT_{test_label}_D{question_label}"
         new_score_column = Transform.get_score_column(id)
         df[new_score_column] = df[score_column]
-        index = (df[f"QUESTAO_{id}_SITUACAO"].isna())
+        answer_situation_column = Transform.get_answer_situation_column(id)
+        index = (df[answer_situation_column].isna())
         df.loc[index, new_score_column] = np.nan
         return df
 
     @staticmethod
-    def __add_column_situation_discursive_question(df: pd.DataFrame, id: int,
-                                                   question_label: int,
-                                                   test_label: str) -> pd.DataFrame:
+    def __add_column_answer_situation_discursive_question(df: pd.DataFrame, id: int,
+                                                          question_label: int,
+                                                          test_label: str) -> pd.DataFrame:
         situation_column = f"TP_S{test_label}_D{question_label}"
-        new_situation_column = Transform.get_score_situation(id)
+        new_situation_column = Transform.get_answer_situation_column(id)
         df[new_situation_column] = df[situation_column]
         df[new_situation_column] = df[new_situation_column].replace(BLANK_DISCURSIVE_ANSWER_CODE,
                                                                 config.BLANK_ANSWER_LABEL)
@@ -216,23 +251,17 @@ class Transform(ABC):
         return df
 
     @staticmethod
-    def __add_column_situation_objective_question(df: pd.DataFrame,
-                                                  id: int,
-                                                  question_label: int,
-                                                  test_label: str) -> pd.DataFrame:
-        new_column_label = Transform.get_score_situation(id)
-        df[new_column_label] = df[f"DS_VT_ACE_O{test_label}"].str[
-            question_label]
-        if (df[new_column_label].isin(CANCELLED_OBJECTIVE_ANSWER_CODE)).any():
-            df[new_column_label] = np.nan
-        else:
-            df[new_column_label] = df[f"DS_VT_ESC_O{test_label}"].str[
-                question_label]
-            df[new_column_label] = df[new_column_label].replace(BLANK_OBJECTIVE_ANSWER_CODE,
-                                                            config.BLANK_ANSWER_LABEL)
-            df[new_column_label] = df[new_column_label].replace(VALID_OBJECTIVE_ANSWER_CODE,
-                                                            config.VAlID_ANSWER_LABEL)
-            df[new_column_label] = df[new_column_label].replace(DELETED_OBJECTIVE_ANSWER_CODE,
+    def __add_column_answer_situation_objective_question(df: pd.DataFrame,
+                                                         id: int,
+                                                         question_label: int,
+                                                         test_label: str) -> pd.DataFrame:
+        new_column_label = Transform.get_answer_situation_column(id)
+        df[new_column_label] = df[f"DS_VT_ESC_O{test_label}"].str[question_label]
+        df[new_column_label] = df[new_column_label].replace(BLANK_OBJECTIVE_ANSWER_CODE,
+                                                        config.BLANK_ANSWER_LABEL)
+        df[new_column_label] = df[new_column_label].replace(VALID_OBJECTIVE_ANSWER_CODE,
+                                                        config.VAlID_ANSWER_LABEL)
+        df[new_column_label] = df[new_column_label].replace(DELETED_OBJECTIVE_ANSWER_CODE,
                                                             config.DELETION_ANSWER_LABEL)
         return df
 

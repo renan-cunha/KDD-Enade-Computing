@@ -35,7 +35,7 @@ BLANK_ANSWER_LABEL = "branco"
 CANCELLED_LABEL = "nula"
 DELETION_ANSWER_LABEL = "rasura"
 VAlID_ANSWER_LABEL = "ok"
-CODE_UFPA_COURSE = 12025 #13881
+CODE_COURSE = '12025' #13881
 STUDENT_CODE_PRESENT = 555
 STUDENT_CODE_ABSENT = 222
 PRESENCE_COLUMN = "TP_PRES"
@@ -51,6 +51,7 @@ DTYPES = {"DS_VT_ESC_OFG": str,
           "NT_OBJ_CE": str,
           "CO_IES": str,
           "CO_CURSO": str,
+          "co_curso": str,
           "CO_MUNIC_CURSO": str,
           "vt_esc_ofg": str,
           "vt_esc_oce": str,

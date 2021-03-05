@@ -102,7 +102,7 @@ def get_computer_science_answer_key_2005(ufpa_cc_score_specific: pd.Series) -> T
 
 
 def select_ufpa_computer_science_2005(df: pd.DataFrame) -> pd.DataFrame:
-    return df.loc[df["co_curso"] == config.CODE_UFPA_COURSE]
+    return df.loc[df["co_curso"] == config.CODE_COURSE]
 
 
 def filter_specific_score_2005(df: pd.DataFrame) -> pd.Series:

@@ -15,6 +15,7 @@ requirements: verify_environment
 
 ## Download data
 download_data: requirements
+	@echo "This whole script takes a few minutes, go grab a coffee :)"
 	@mkdir -p data/raw_data/enade_data
 	$(PYTHON_INTERPRETER) src/get_data/get_raw_data.py --data_path data/raw_data/enade_data --download
 
@@ -40,8 +41,12 @@ transform_data:
 	$(PYTHON_INTERPRETER) src/transformation/transform.py
 	@echo "Data transformed"
 
+run_notebooks:
+	@echo "Running notebooks"
+	papermill notebooks/difficulty.ipynb results/difficulty.ipynb
+
 ## Run all necessary comamnds
-all: verify_environment requirements download_data extract_data select_data pre_process_data transform_data
+all: verify_environment requirements download_data extract_data select_data pre_process_data transform_data run_notebooks
 	@echo "Done"
 
 ## remove data files
