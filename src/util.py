@@ -3,7 +3,7 @@ from typing import Union, List, Callable
 import numpy as np
 from src.config import NUM_ENADE_EXAM_QUESTIONS, MAX_SUBJECTS_PER_QUESTION, \
     STUDENT_CODE_ABSENT, STUDENT_CODE_PRESENT, BLANK_ANSWER_LABEL, DELETION_ANSWER_LABEL, \
-    DIFFICULTIES
+    DIFFICULTIES, CODE_COURSE, YEARS
 from src.process2014_2017 import ProcessEnade2014_2017
 from src.process2011 import ProcessEnade2011
 from src.process2008 import ProcessEnade2008
@@ -256,15 +256,17 @@ def get_difficulty_valid_questions(diffculty: str, df_difficulty: pd.DataFrame,
     return result
 
 
-def get_dict_all_years(filter_by_ufpa: bool) -> dict:
-    """Return a dict with keys as year, and values as enade_df"""
-    enade_2017 = ProcessEnade2014_2017(2017).get_data(filter_by_ufpa)
-    enade_2014 = ProcessEnade2014_2017(2014).get_data(filter_by_ufpa)
-    enade_2011 = ProcessEnade2011().get_data(filter_by_ufpa)
-    enade_2008 = ProcessEnade2008().get_data(filter_by_ufpa)
-    enade_2005 = ProcessEnade2005().get_data(filter_by_ufpa)
-    return {2017: enade_2017, 
-            2014: enade_2014, 
-            2011: enade_2011,
-            2008: enade_2008,
-            2005: enade_2005}
+def read_csv_course(year, filter_by_course):
+    df = transform.read_csv(year)
+    if filter_by_course:
+        df = df.loc[df["CO_CURSO"] == CODE_COURSE]
+    return df
+
+
+def get_dict_all_years(filter_by_course: bool) -> dict:
+    result = {}
+    for year in YEARS:
+        result[year] = read_csv_course(year, filter_by_course=filter_by_course)
+
+    return result
+

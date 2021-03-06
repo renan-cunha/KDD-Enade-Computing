@@ -43,6 +43,7 @@ transform_data:
 
 run_notebooks:
 	@echo "Running notebooks"
+	papermill notebooks/subject_analysis.ipynb results/subject_analysis.ipynb
 	papermill notebooks/difficulty.ipynb results/difficulty.ipynb
 	papermill notebooks/type_exam.ipynb results/type_exam.ipynb
 	papermill notebooks/absent_and_blank.ipynb results/absent_and_blank.ipynb
