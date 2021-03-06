@@ -41,7 +41,7 @@ STUDENT_CODE_ABSENT = 222
 PRESENCE_COLUMN = "TP_PRES"
 ENADE_DATA_DIR = os.path.join(DATA_DIR, "enade")
 SUBJECT_DF_NAME = "classificacao_charao.csv"
-SUBJECT_DF_PATH = os.path.join(DATA_DIR, SUBJECT_DF_NAME)
+SUBJECT_DF_PATH = os.path.join(DATA_DIR, "raw_data", SUBJECT_DF_NAME)
 SUBJECT_CONTENT_COLUMNS = ["conteudo1", "conteudo2", "conteudo3"]
 
 DTYPES = {"DS_VT_ESC_OFG": str,

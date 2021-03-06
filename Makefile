@@ -44,6 +44,7 @@ transform_data:
 run_notebooks:
 	@echo "Running notebooks"
 	papermill notebooks/difficulty.ipynb results/difficulty.ipynb
+	papermill notebooks/type_exam.ipynb results/type_exam.ipynb
 
 ## Run all necessary comamnds
 all: verify_environment requirements download_data extract_data select_data pre_process_data transform_data run_notebooks
