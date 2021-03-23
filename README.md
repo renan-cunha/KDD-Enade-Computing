@@ -2,10 +2,11 @@
 
 [![Build Status](https://travis-ci.com/renan-cunha/KDD-HigherEduBR.svg?token=HVUZn2CgFZmexfaxxwwt&branch=master)](https://travis-ci.com/renan-cunha/KDD-HigherEduBR) [![codecov](https://codecov.io/gh/renan-cunha/KDD-HigherEduBR/branch/master/graph/badge.svg?token=WZZTE0Y1A6)](https://codecov.io/gh/renan-cunha/KDD-HigherEduBR)
 
-Data Mining with ENADE of the Brazilian Computer Science courses
+Data Mining with the ENADE of the Brazilian Computer Science courses
 
 ## About the Project
 
+Enade is the exam applied at the end of the course in order to measure the performance of students.
 This analysis uses ENADE microdata for all the Brazilian Computer Science Courses.
 The goal is to provide information that can be useful for directors and coordinators
 who want to improve the quality of their courses. 
