@@ -4,10 +4,6 @@ import numpy as np
 from src.config import NUM_ENADE_EXAM_QUESTIONS, MAX_SUBJECTS_PER_QUESTION, \
     STUDENT_CODE_ABSENT, STUDENT_CODE_PRESENT, BLANK_ANSWER_LABEL, DELETION_ANSWER_LABEL, \
     DIFFICULTIES, CODE_COURSE, YEARS
-from src.process2014_2017 import ProcessEnade2014_2017
-from src.process2011 import ProcessEnade2011
-from src.process2008 import ProcessEnade2008
-from src.process2005 import ProcessEnade2005
 from src.transformation import transform
 
 
