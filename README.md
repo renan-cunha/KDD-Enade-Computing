@@ -44,20 +44,29 @@ The data tells:
   or [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html)
 ## Usage
 
-To run in the first time, do
+Run a first time to download and pre_process data, 
+then run with the desired course.
+
+### First time
 
 ```
-make all
+make first_time
 ```
 
-To run 
+### Run the Analysis
 
-#### View/Run the analysis
-
-All the results are presented in the ```notebooks/``` folder.
+To run the analysis, use the [e-mec code](https://emec.mec.gov.br/) of the computer science course you want. Below is an example with the course of UFPA
 
 ```
-cd notebooks/
+make code_course=12025 run_notebooks
+```
+
+### View the Results
+
+All the results are presented in the ```results/``` folder.
+
+```
+cd results/
 jupyter-notebook <name-of-the-notebook>.ipynb
 ```
 
