@@ -17,7 +17,9 @@ The data tells:
 2. what is the change in performance in a given subject over the years; 
 3. if the students have low participation in the exam. 
 
-<SOME PHOTOS HERE>
+![](docs/subject_analysis_score.resized.png)
+![Imgur](docs/difference_years.resized.png)
+![](docs/student_frequency.resized.png)
 
 ### Built with
 
