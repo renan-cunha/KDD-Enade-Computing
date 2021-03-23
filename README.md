@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.com/renan-cunha/KDD-Enade-Computing.svg?token=HVUZn2CgFZmexfaxxwwt&branch=master)](https://travis-ci.com/renan-cunha/KDD-HigherEduBR) [![codecov](https://codecov.io/gh/renan-cunha/KDD-HigherEduBR/branch/master/graph/badge.svg?token=WZZTE0Y1A6)](https://codecov.io/gh/renan-cunha/KDD-HigherEduBR)
 
-Data Mining with the ENADE of the Brazilian Computer Science courses
+Data Mining with the ENADE of Brazilian Computer Science courses
 
 ## About the Project
 
@@ -44,7 +44,7 @@ The data tells:
   or [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html)
 ## Usage
 
-Run a first time to download and pre_process data, 
+Run a first time to download and pre-process data, 
 then run with the desired course.
 
 ### First time
