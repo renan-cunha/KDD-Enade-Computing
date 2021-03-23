@@ -3,7 +3,7 @@ from typing import Union, List, Callable
 import numpy as np
 from src.config import NUM_ENADE_EXAM_QUESTIONS, MAX_SUBJECTS_PER_QUESTION, \
     STUDENT_CODE_ABSENT, STUDENT_CODE_PRESENT, BLANK_ANSWER_LABEL, DELETION_ANSWER_LABEL, \
-    DIFFICULTIES, CODE_COURSE, YEARS
+    DIFFICULTIES, UFPA_CODE_COURSE, YEARS, CODE_COURSE
 from src.transformation import transform
 
 
@@ -252,14 +252,14 @@ def get_difficulty_valid_questions(diffculty: str, df_difficulty: pd.DataFrame,
     return result
 
 
-def read_csv_course(year, filter_by_course):
+def read_csv_course(year, filter_by_course: int):
     df = transform.read_csv(year)
-    if filter_by_course:
-        df = df.loc[df["CO_CURSO"] == CODE_COURSE]
+    if filter_by_course is not False:
+        df = df.loc[df["CO_CURSO"] == filter_by_course]
     return df
 
 
-def get_dict_all_years(filter_by_course: bool) -> dict:
+def get_dict_all_years(filter_by_course: int) -> dict:
     result = {}
     for year in YEARS:
         result[year] = read_csv_course(year, filter_by_course=filter_by_course)

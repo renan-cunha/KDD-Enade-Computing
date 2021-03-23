@@ -43,13 +43,16 @@ transform_data:
 
 run_notebooks:
 	@echo "Running notebooks"
-	papermill notebooks/subject_analysis.ipynb results/subject_analysis.ipynb
-	papermill notebooks/difficulty.ipynb results/difficulty.ipynb
-	papermill notebooks/type_exam.ipynb results/type_exam.ipynb
-	papermill notebooks/absent_and_blank.ipynb results/absent_and_blank.ipynb
+	papermill notebooks/subject_analysis.ipynb results/subject_analysis.ipynb -r CODE_COURSE $(code_course)
+	papermill notebooks/difficulty.ipynb results/difficulty.ipynb -r CODE_COURSE $(code_course)
+	papermill notebooks/type_exam.ipynb results/type_exam.ipynb -r CODE_COURSE $(code_course)
+	papermill notebooks/absent_and_blank.ipynb results/absent_and_blank.ipynb -r CODE_COURSE $(code_course)
 
 ## Run all necessary comamnds
 all: verify_environment requirements download_data extract_data select_data pre_process_data transform_data run_notebooks
+	@echo "Done"
+
+first_time: verify_environment requirements download_data extract_data select_data pre_process_data transform_data
 	@echo "Done"
 
 ## remove data files
