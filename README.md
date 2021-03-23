@@ -1,6 +1,6 @@
 # KDD-Enade-Computing
 
-[![Build Status](https://travis-ci.com/renan-cunha/KDD-HigherEduBR.svg?token=HVUZn2CgFZmexfaxxwwt&branch=master)](https://travis-ci.com/renan-cunha/KDD-HigherEduBR) [![codecov](https://codecov.io/gh/renan-cunha/KDD-HigherEduBR/branch/master/graph/badge.svg?token=WZZTE0Y1A6)](https://codecov.io/gh/renan-cunha/KDD-HigherEduBR)
+[![Build Status](https://travis-ci.com/renan-cunha/KDD-Enade-Computing.svg?token=HVUZn2CgFZmexfaxxwwt&branch=master)](https://travis-ci.com/renan-cunha/KDD-HigherEduBR) [![codecov](https://codecov.io/gh/renan-cunha/KDD-HigherEduBR/branch/master/graph/badge.svg?token=WZZTE0Y1A6)](https://codecov.io/gh/renan-cunha/KDD-HigherEduBR)
 
 Data Mining with the ENADE of the Brazilian Computer Science courses
 
