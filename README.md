@@ -27,6 +27,7 @@ The data tells:
   [Matplotlib](https://matplotlib.org/), [Seaborn](https://seaborn.pydata.org/))
 * [Jupyter Notebooks](https://jupyter.org/)
 * [Papermill](https://papermill.readthedocs.io/)
+* [Cookiecutter Data Science Project Structure](https://drivendata.github.io/cookiecutter-data-science/)
 
 ## Getting Started
 
