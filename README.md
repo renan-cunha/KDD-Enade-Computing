@@ -33,7 +33,7 @@ The data tells:
 
 ### Prerequisities
 
-* Python 3.6
+* Python 3.6.9
 * Linux
 * Make
 
