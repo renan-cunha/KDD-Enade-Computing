@@ -39,6 +39,7 @@ transform_data:
 
 run_analysis:
 	@echo "Running Analisys"
+	mkdir -p results/
 	papermill notebooks/subject_analysis.ipynb results/subject_analysis.ipynb -r CODE_COURSE $(code_course)
 	papermill notebooks/difficulty.ipynb results/difficulty.ipynb -r CODE_COURSE $(code_course)
 	papermill notebooks/type_exam.ipynb results/type_exam.ipynb -r CODE_COURSE $(code_course)
