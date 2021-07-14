@@ -5,12 +5,14 @@ jobs:
       python: 3.6.9
 # command to install dependencies
 install:
-  - pip install -r requirements.txt
+  - make create_env
+  - conda activate KddEnade
   - pip install pytest-cov codecov
 # command to run tests
 script:
-  - make first_time
-  - make code_course=12025 run_notebooks
+  - conda activate KddEnade
+  - make dowload_and_process
+  - make code_course=12025 run_analisys
   - pytest --cov=src tests
 after_success:
   - codecov -t 376fbdd4-aa15-48a7-b0ad-add2ee3eaba4
