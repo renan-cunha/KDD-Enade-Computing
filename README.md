@@ -39,6 +39,7 @@ The data tells:
 * Linux/WSL
 * Make
 * [Conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html)
+* A minimum of 8gb of ram, 16gb is recommended.
 
 ### Set up Environment
 
