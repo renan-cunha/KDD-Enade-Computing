@@ -19,7 +19,7 @@ install:
 # command to run tests
 script:
   - conda activate KddEnade
-  - make dowload_and_process
+  - make download_and_process
   - make code_course=12025 run_analisys
   - pytest --cov=src tests
 after_success:
