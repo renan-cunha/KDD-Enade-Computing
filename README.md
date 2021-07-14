@@ -46,7 +46,7 @@ The data tells:
 git clone git@github.com:renan-cunha/KDD-Enade-Computing.git
 cd Kdd-Enade-Computing/
 make create_env
-conda active KddEnade
+conda activate KddEnade
 ```
 
 ## Usage
