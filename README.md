@@ -56,7 +56,7 @@ then run the analysis with the desired course.
 
 ### Download and Process Data
 ```
-make dowload_and_process
+make download_and_process
 ```
 
 ### Run the Analysis
