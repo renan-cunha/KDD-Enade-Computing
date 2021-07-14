@@ -44,7 +44,7 @@ The data tells:
 
 ```
 git clone git@github.com:renan-cunha/KDD-Enade-Computing.git
-cd Kdd-Enade-Computing/
+cd KDD-Enade-Computing/
 make create_env
 conda activate KddEnade
 ```
