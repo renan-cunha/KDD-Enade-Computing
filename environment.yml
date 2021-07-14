@@ -1,0 +1,26 @@
+name: KddEnade
+dependencies:
+  - python=3.6.9 
+  - click=7.1.2
+  - codecov=2.1.10
+  - coverage=5.3
+  - jupyter=1.0.0
+  - matplotlib=3.2.2
+  - nbclient=0.5.3
+  - nbconvert=6.0.7
+  - nbformat=5.1.2
+  - notebook=6.2.0
+  - pandas=1.1.1
+  - pytest=6.1.2
+  - pytest-cov=2.10.1
+  - pytest-mock=3.4.0
+  - seaborn=0.9.0
+  - tqdm=4.54.1
+  - urllib3=1.26.4
+  - zipp=3.4.0
+  - black=19.10b0
+  - pip
+  - pip:
+    - papermill==2.3.2
+    - numpy==1.19.4
+    - scipy==1.5.4

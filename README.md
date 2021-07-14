@@ -6,8 +6,11 @@ Data Mining with the ENADE of Brazilian Computer Science courses
 
 ## About the Project
 
+This is the code from the paper *[Automatic Analysis with ENADE Microdata to Improve 
+the Quality of Computer Science Courses](https://sol.sbc.org.br/index.php/wei/article/view/15912Automatic)*
+
 Enade is the exam applied at the end of the course in order to measure the performance of students.
-This analysis uses ENADE microdata for all the Brazilian Computer Science Courses.
+This analysis uses ENADE microdata from the Brazilian Computer Science Courses.
 The goal is to provide information that can be useful for directors and coordinators
 who want to improve the quality of their courses. 
 
@@ -33,37 +36,40 @@ The data tells:
 
 ### Prerequisities
 
-* Python 3.6.9+
-* Linux
+* Linux/WSL
 * Make
+* [Conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html)
 
 ### Set up Environment
 
-* Setup a virtual environment using python 3.6, use 
-  [virtualenv](https://docs.python-guide.org/dev/virtualenvs/#lower-level-virtualenv) 
-  or [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html)
+```
+git clone git@github.com:renan-cunha/KDD-Enade-Computing.git
+cd Kdd-Enade-Computing/
+make create_env
+conda active KddEnade
+```
+
 ## Usage
 
-Run a first time to download and pre-process data, 
-then run with the desired course.
+First, download and pre-process data, 
+then run the analysis with the desired course.
 
-### First time
-
+### Download and Process Data
 ```
-make first_time
+make dowload_and_process
 ```
 
 ### Run the Analysis
 
-To run the analysis, use the [e-mec code](https://emec.mec.gov.br/) of the computer science course you want. Below is an example with the course of UFPA
+To run the analysis, use the [e-mec code](https://emec.mec.gov.br/) of the computer science course you want. Below is an example with the course of the UFPA.
 
 ```
-make code_course=12025 run_notebooks
+make code_course=12025 run_analysis
 ```
 
 ### View the Results
 
-All the results are presented in the ```results/``` folder.
+All the results are presented in four notebooks of the ```results/``` folder.
 
 ```
 cd results/

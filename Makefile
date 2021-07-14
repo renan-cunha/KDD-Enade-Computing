@@ -1,20 +1,16 @@
-.PHONY: download_data requirements extract_data select_data pre_process_data transform_data all
+.PHONY: create_env download_data extract_data select_data pre_process_data transform_data all download_and_process run_analisys
 
 PYTHON_INTERPRETER = python3
 #################################################################################
 # COMMANDS                                                                      #
 #################################################################################
 
-## Verify if the right python version is being used
-verify_environment:
-	$(PYTHON_INTERPRETER) src/verify_environment.py
-
-## Check the python requirements
-requirements: verify_environment
-	$(PYTHON_INTERPRETER) -m pip install -r requirements.txt
-
+## Create environment
+create_env:
+	 conda env create -f environment.yml
+	
 ## Download data
-download_data: requirements
+download_data: 
 	@echo "This whole script takes a few minutes, go grab a coffee :)"
 	@mkdir -p data/raw_data/enade_data
 	$(PYTHON_INTERPRETER) src/get_data/get_raw_data.py --data_path data/raw_data/enade_data --download
@@ -41,18 +37,18 @@ transform_data:
 	$(PYTHON_INTERPRETER) src/transformation/transform.py
 	@echo "Data transformed"
 
-run_notebooks:
-	@echo "Running notebooks"
+run_analysis:
+	@echo "Running Analisys"
 	papermill notebooks/subject_analysis.ipynb results/subject_analysis.ipynb -r CODE_COURSE $(code_course)
 	papermill notebooks/difficulty.ipynb results/difficulty.ipynb -r CODE_COURSE $(code_course)
 	papermill notebooks/type_exam.ipynb results/type_exam.ipynb -r CODE_COURSE $(code_course)
 	papermill notebooks/absent_and_blank.ipynb results/absent_and_blank.ipynb -r CODE_COURSE $(code_course)
 
 ## Run all necessary comamnds
-all: verify_environment requirements download_data extract_data select_data pre_process_data transform_data run_notebooks
+all: download_data extract_data select_data pre_process_data transform_data run_analisys
 	@echo "Done"
 
-first_time: verify_environment requirements download_data extract_data select_data pre_process_data transform_data
+download_and_process: download_data extract_data select_data pre_process_data transform_data
 	@echo "Done"
 
 ## remove data files
