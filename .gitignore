@@ -5,6 +5,7 @@ enade/
 .zip
 /references/
 
+results/
 # pipfile
 Pipfile*
 
