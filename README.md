@@ -92,6 +92,6 @@ Renan Cunha - [renancunhafonseca@gmail.com](renancunhafonseca@gmail.com)
 
 ## Acknowledgements
 
-This repository was developed as a research project at the Universidade Federal do Pará, with the guidance of Professor [Reginaldo Santos](https://www.escavador.com/sobre/5457885/reginaldo-cordeiro-dos-santos-filho).
+This repository was developed as a research project at the Universidade Federal do Pará, with the guidance of Professor [Reginaldo Santos](https://www.escavador.com/sobre/5457885/reginaldo-cordeiro-dos-santos-filho) and [Claudomiro Sales](https://www.linkedin.com/in/claudomiro-sales-7923b121/).
 
 [![UFPA](docs/logo_ufpa_github_footer.png)](https://portal.ufpa.br/ "Visite o site da UFPA")
